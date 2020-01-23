@@ -1,5 +1,17 @@
 'use strict';
 
+const {
+  getRandomInt,
+  shuffleArray
+} = require(`../../utils`);
+
+const {
+  DEFAULT_OFFER_NUMBER,
+  MOCK_FILE_PATH
+} = require(`../../constants`);
+
+const fs = require(`fs`);
+
 const TITLES = [
   `Продам книги Стивена Кинга.`,
   `Продам новую приставку Sony Playstation 5.`,
@@ -44,18 +56,36 @@ const SumRestrict = {
   MIN: 1000
 };
 
-const generateMockObject = {
-  type: `offer`,
-  title: ``,
-  description: ``,
-  sum: ``,
-  picture: ``,
-  category: ``
+const generateOffers = (offersNumber) => {
+  return Array(offersNumber).fill({}).map(() => ({
+    type: `offer`,
+    title: TITLES[getRandomInt(0, TITLES.length - 1)],
+    description: shuffleArray(SENTENCES).slice(1, 5).join(` `),
+    sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
+    picture: `item${getRandomInt(1, 16)}.jpg`,
+    category: CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]
+  }))
 };
 
 module.exports = {
   name: `--generate`,
-  run() {
-    console.info(packageJsonFile.version);
+  run(args) {
+    const [offersNumberFromUser] = args;
+    const offersNumber = Number(offersNumberFromUser) || DEFAULT_OFFER_NUMBER;
+
+    if (offersNumber > 1000) {
+      console.info(`No more than 1000 advertisements`);
+      process.exit(0);
+    }
+
+    fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber)), (error) => {
+      if (error) {
+        console.error(`Can't write data to file...`);
+        process.exit(1);
+      }
+
+      console.info(`Operation success. File created`);
+      process.exit(0);
+    })
   }
 };
