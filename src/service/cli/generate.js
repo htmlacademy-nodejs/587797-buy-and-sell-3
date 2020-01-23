@@ -64,7 +64,7 @@ const generateOffers = (offersNumber) => {
     sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
     picture: `item${getRandomInt(1, 16)}.jpg`,
     category: CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]
-  }))
+  }));
 };
 
 module.exports = {
@@ -86,6 +86,6 @@ module.exports = {
 
       console.info(`Operation success. File created`);
       process.exit(0);
-    })
+    });
   }
 };
