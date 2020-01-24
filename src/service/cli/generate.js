@@ -24,23 +24,26 @@ const TITLES = [
   `Куплю детские санки.`
 ];
 
-const SENTENCES = [
-  `Товар в отличном состоянии.`,
-  `Пользовались бережно и только по большим праздникам.`,
-  `Продаю с болью в сердце...`,
-  `Бонусом отдам все аксессуары.`,
-  `Даю недельную гарантию.`,
-  `Если товар не понравится — верну всё до последней копейки.`,
-  `Это настоящая находка для коллекционера!`,
-  `Если найдёте дешевле — сброшу цену.`,
-  `Таких предложений больше нет!`,
-  `Две страницы заляпаны свежим кофе.`,
-  `При покупке с меня бесплатная доставка в черте города.`,
-  `Кажется, что это хрупкая вещь.`,
-  `Мой дед не мог её сломать.`,
-  `Кому нужен этот новый телефон, если тут такое...`,
-  `Не пытайтесь торговаться. Цену вещам я знаю.`
-];
+const Sentences = {
+  MAX_VALUE: 5,
+  VALUES: [
+    `Товар в отличном состоянии.`,
+    `Пользовались бережно и только по большим праздникам.`,
+    `Продаю с болью в сердце...`,
+    `Бонусом отдам все аксессуары.`,
+    `Даю недельную гарантию.`,
+    `Если товар не понравится — верну всё до последней копейки.`,
+    `Это настоящая находка для коллекционера!`,
+    `Если найдёте дешевле — сброшу цену.`,
+    `Таких предложений больше нет!`,
+    `Две страницы заляпаны свежим кофе.`,
+    `При покупке с меня бесплатная доставка в черте города.`,
+    `Кажется, что это хрупкая вещь.`,
+    `Мой дед не мог её сломать.`,
+    `Кому нужен этот новый телефон, если тут такое...`,
+    `Не пытайтесь торговаться. Цену вещам я знаю.`
+  ]
+};
 
 const CATEGORIES = [
   `Книги`,
@@ -56,14 +59,26 @@ const SumRestrict = {
   MIN: 1000
 };
 
+const OfferType = {
+  offer: `offer`,
+  type: `type`
+};
+
+const PictureValue = {
+  MIN: 1,
+  MAX: 16
+};
+
 const generateOffers = (offersNumber) => {
+  const offerTypes = Object.keys(OfferType);
+
   return Array(offersNumber).fill({}).map(() => ({
-    type: `offer`,
+    type: OfferType[offerTypes[getRandomInt(0, offerTypes.length - 1)]],
     title: TITLES[getRandomInt(0, TITLES.length - 1)],
-    description: shuffleArray(SENTENCES).slice(1, 5).join(` `),
+    description: shuffleArray(Sentences.VALUES).slice(1, Sentences.MAX_VALUE).join(` `),
     sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
-    picture: `item${getRandomInt(1, 16)}.jpg`,
-    category: CATEGORIES[getRandomInt(0, CATEGORIES.length - 1)]
+    picture: `item${getRandomInt(PictureValue.MIN, PictureValue.MAX)}.jpg`,
+    category: shuffleArray(CATEGORIES).slice(1, getRandomInt(1, CATEGORIES.length - 1))
   }));
 };
 
