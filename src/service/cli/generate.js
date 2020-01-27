@@ -13,7 +13,7 @@ const {
   ExitCode
 } = require(`../../constants`);
 
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
 
 const TITLES = [
   `Продам книги Стивена Кинга.`,
@@ -87,7 +87,7 @@ const generateOffers = (offersNumber) => {
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [offersNumberFromUser] = args;
     const offersNumber = Number(offersNumberFromUser) || DEFAULT_OFFER_NUMBER;
 
@@ -96,14 +96,14 @@ module.exports = {
       process.exit(ExitCode.SUCCESS);
     }
 
-    fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber)), (error) => {
-      if (error) {
-        console.error(chalk.red(`Can't write data to file...`));
-        process.exit(ExitCode.FAIL);
-      }
+    try {
+      await fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber)));
+    } catch (error) {
+      console.error(chalk.red(`Can't write data to file...`));
+      process.exit(ExitCode.FAIL);
+    }
 
-      console.info(chalk.green(`Operation success. File created`));
-      process.exit(ExitCode.SUCCESS);
-    });
+    console.info(chalk.green(`Operation success. File created`));
+    process.exit(ExitCode.SUCCESS);
   }
 };
