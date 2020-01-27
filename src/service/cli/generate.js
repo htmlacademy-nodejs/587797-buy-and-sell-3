@@ -1,5 +1,6 @@
 'use strict';
 
+const chalk = require(`chalk`);
 const {
   getRandomInt,
   shuffleArray
@@ -7,7 +8,9 @@ const {
 
 const {
   DEFAULT_OFFER_NUMBER,
-  MOCK_FILE_PATH
+  MOCK_FILE_PATH,
+  MAX_MOCK_OBJECT_NUMBER,
+  ExitCode
 } = require(`../../constants`);
 
 const fs = require(`fs`);
@@ -88,19 +91,19 @@ module.exports = {
     const [offersNumberFromUser] = args;
     const offersNumber = Number(offersNumberFromUser) || DEFAULT_OFFER_NUMBER;
 
-    if (offersNumber > 1000) {
-      console.info(`No more than 1000 advertisements`);
-      process.exit(0);
+    if (offersNumber > MAX_MOCK_OBJECT_NUMBER) {
+      console.info(chalk.green(`No more than ${MAX_MOCK_OBJECT_NUMBER} advertisements`));
+      process.exit(ExitCode.SUCCESS);
     }
 
     fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber)), (error) => {
       if (error) {
-        console.error(`Can't write data to file...`);
-        process.exit(1);
+        console.error(chalk.red(`Can't write data to file...`));
+        process.exit(ExitCode.FAIL);
       }
 
-      console.info(`Operation success. File created`);
-      process.exit(0);
+      console.info(chalk.green(`Operation success. File created`));
+      process.exit(ExitCode.SUCCESS);
     });
   }
 };
