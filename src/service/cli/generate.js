@@ -105,5 +105,6 @@ module.exports = {
 
     console.info(chalk.green(`Operation success. File created`));
     process.exit(ExitCode.SUCCESS);
+
   }
 };
