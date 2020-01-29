@@ -13,9 +13,9 @@ const {
   ExitCode
 } = require(`../../constants`);
 
-const FILE_SENTENCES_PATH = `./src/service/data/sentences.txt`;
-const FILE_TITLES_PATH = `./src/service/data/titles.txt`;
-const FILE_CATEGORIES_PATH = `./src/service/data/categories.txt`;
+const FILE_SENTENCES_PATH = `./data/sentences.txt`;
+const FILE_TITLES_PATH = `./data/titles.txt`;
+const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 
 const fs = require(`fs`).promises;
 
