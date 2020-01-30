@@ -9,5 +9,9 @@ module.exports = {
   },
   DEFAULT_OFFER_NUMBER: 1,
   MOCK_FILE_PATH: `mocks.json`,
-  MAX_MOCK_OBJECT_NUMBER: 1000
+  MAX_MOCK_OBJECT_NUMBER: 1000,
+  HttpCode: {
+    OK: 200,
+    NOT_FOUND: 404
+  }
 };
