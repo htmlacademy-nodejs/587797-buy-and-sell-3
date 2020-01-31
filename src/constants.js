@@ -12,6 +12,10 @@ module.exports = {
   MAX_MOCK_OBJECT_NUMBER: 1000,
   HttpCode: {
     OK: 200,
-    NOT_FOUND: 404
+    NOT_FOUND: 404,
+    INTERNAL_ERROR: 500
+  },
+  ErrorCode: {
+    NO_FILE_OR_DIRECTORY: `ENOENT`
   }
 };

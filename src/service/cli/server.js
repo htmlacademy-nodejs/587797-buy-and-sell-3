@@ -5,7 +5,8 @@ const http = require(`http`);
 const fs = require(`fs`).promises;
 const {
   MOCK_FILE_PATH,
-  HttpCode
+  HttpCode,
+  ErrorCode
 } = require(`../../constants`);
 
 const DEFAULT_PORT = 3000;
@@ -30,6 +31,7 @@ const sendResponse = (res, statusCode, message) => {
 
 const onClientConnect = async (req, res) => {
   const notFoundMessageText = `Not found`;
+  const internalErrorMessageText = `Internal error`;
 
   switch (req.url) {
     case `/`:
@@ -40,7 +42,11 @@ const onClientConnect = async (req, res) => {
 
         sendResponse(res, HttpCode.OK, `<ul>${message}</ul>`);
       } catch (error) {
-        sendResponse(res, HttpCode.NOT_FOUND, notFoundMessageText);
+        if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
+          sendResponse(res, HttpCode.NOT_FOUND, notFoundMessageText);
+        } else {
+          sendResponse(res, HttpCode.INTERNAL_ERROR, internalErrorMessageText);
+        }
       }
 
       break;
