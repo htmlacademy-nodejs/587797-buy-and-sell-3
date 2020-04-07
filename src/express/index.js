@@ -35,7 +35,6 @@ app.get('/search', (req, res) => {
 app.listen(PORT);
 
 app.use((req, res, next) => {
-  console.log('test');
   res
     .status(404)
     .render(`errors/400`, {
