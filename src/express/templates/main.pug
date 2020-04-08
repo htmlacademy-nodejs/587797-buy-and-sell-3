@@ -5,53 +5,53 @@ block content
     .message
       .message__text
         p На сайте еще не опубликовано ни одного объявления.
-      a.message__link.btn.btn--big(href='#') Вход и регистрация
+      a.message__link.btn.btn--big(href='/login') Вход и регистрация
   else
     section.categories-list
       h1.visually-hidden Сервис объявлений "Куплю - продам"
       ul.categories-list__wrapper
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/1')
             span.category-tile__image
               img(src='img/cat.jpg', srcset='img/cat@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Дом
-              span.category-tile__qty.js-qty 81
+              span.category-tile__qty.js-qty  81
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/2')
             span.category-tile__image
               img(src='img/cat02.jpg', srcset='img/cat02@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Электроника
-              span.category-tile__qty.js-qty 62
+              span.category-tile__qty.js-qty  62
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/3')
             span.category-tile__image
               img(src='img/cat03.jpg', srcset='img/cat03@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Одежда
-              span.category-tile__qty.js-qty 106
+              span.category-tile__qty.js-qty  106
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/4')
             span.category-tile__image
               img(src='img/cat04.jpg', srcset='img/cat04@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Спорт/отдых
-              span.category-tile__qty.js-qty 86
+              span.category-tile__qty.js-qty  86
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/5')
             span.category-tile__image
               img(src='img/cat05.jpg', srcset='img/cat05@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Авто
-              span.category-tile__qty.js-qty 34
+              span.category-tile__qty.js-qty  34
         li.categories-list__item
-          a.category-tile.category-tile--default(href='#')
+          a.category-tile.category-tile--default(href='/offers/category/6')
             span.category-tile__image
               img(src='img/cat06.jpg', srcset='img/cat06@2x.jpg 2x', alt='Иконка категории')
             span.category-tile__label
               | Книги
-              span.category-tile__qty.js-qty 92
+              span.category-tile__qty.js-qty  92
     section.tickets-list
       h2.visually-hidden Самые новые предложения
       .tickets-list__wrapper
@@ -65,10 +65,10 @@ block content
               .ticket-card__info
                 span.ticket-card__label Куплю
                 .ticket-card__categories
-                  a(href='#') Дом
+                  a(href='/offers/category/1') Дом
                 .ticket-card__header
                   h3.ticket-card__title
-                    a(href='#') Монстера
+                    a(href='/offers/1') Монстера
                   p.ticket-card__price
                     span.js-sum 1000
                     |  ₽

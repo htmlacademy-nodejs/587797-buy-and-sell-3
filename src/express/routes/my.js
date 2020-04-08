@@ -1,17 +1,19 @@
-const {Router} = require('express');
+'use strict';
 
-myRouter = Router();
+const {Router} = require(`express`);
 
-myRouter.get('/', (req, res) => {
+const myRouter = new Router();
+
+myRouter.get(`/`, (req, res) => {
   res.render(`my/my-tickets`, {
     isAuth: true
-  })
+  });
 });
-myRouter.get('/comments', (req, res) => {
+myRouter.get(`/comments`, (req, res) => {
   res.render(`my/comments`, {
     isAuth: true,
     comments: [1]
-  })
+  });
 });
 
 module.exports = myRouter;
