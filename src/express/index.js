@@ -8,10 +8,7 @@ const myRouter = require(`./routes/my`);
 const offersRouter = require(`./routes/offers`);
 
 const PORT = 8080;
-const HttpStatusCodes = {
-  NOT_FOUND: 404,
-  SERVER_ERROR: 500
-};
+const {HttpCode} = require(`../constants`);
 const PUBLIC_DIR = `public`;
 
 const app = express();
@@ -29,7 +26,7 @@ app.listen(PORT);
 
 app.use((req, res, next) => {
   res
-    .status(HttpStatusCodes.NOT_FOUND)
+    .status(HttpCode.NOT_FOUND)
     .render(`errors/400`, {
       errorClass: `html-not-found`
     });
@@ -39,7 +36,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   res
-    .status(HttpStatusCodes.SERVER_ERROR)
+    .status(HttpCode.INTERNAL_ERROR)
     .render(`errors/500`, {
       errorClass: `html-server`
     });
