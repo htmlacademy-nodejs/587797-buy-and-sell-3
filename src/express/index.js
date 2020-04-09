@@ -1,10 +1,16 @@
 'use strict';
 
 const express = require(`express`);
+
+const mainRouter = require(`./routes/main`);
 const myRouter = require(`./routes/my`);
 const offersRouter = require(`./routes/offers`);
 
 const PORT = 8080;
+const HttpStatusCodes = {
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500
+};
 
 const app = express();
 
@@ -13,32 +19,15 @@ app.use(express.static(`markup`));
 app.set(`views`, __dirname + `/templates`);
 app.set(`view engine`, `pug`);
 
+app.use(`/`, mainRouter);
 app.use(`/my`, myRouter);
 app.use(`/offers`, offersRouter);
-
-app.get(`/`, (req, res) => {
-  res.render(`main`, {
-    tickets: [1]
-  });
-});
-app.get(`/register`, (req, res) => {
-  res.render(`sign-up`);
-});
-app.get(`/login`, (req, res) => {
-  res.render(`login`);
-});
-app.get(`/search`, (req, res) => {
-  res.render(`search-result`, {
-    isAuth: true,
-    results: [1]
-  });
-});
 
 app.listen(PORT);
 
 app.use((req, res, next) => {
   res
-    .status(404)
+    .status(HttpStatusCodes.NOT_FOUND)
     .render(`errors/400`, {
       errorClass: `html-not-found`
     });
@@ -48,7 +37,7 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
   res
-    .status(500)
+    .status(HttpStatusCodes.SERVER_ERROR)
     .render(`errors/500`, {
       errorClass: `html-server`
     });
