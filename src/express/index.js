@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require(`path`);
 const express = require(`express`);
 
 const mainRouter = require(`./routes/main`);
@@ -11,12 +12,13 @@ const HttpStatusCodes = {
   NOT_FOUND: 404,
   SERVER_ERROR: 500
 };
+const PUBLIC_DIR = `public`;
 
 const app = express();
 
-app.use(express.static(`markup`));
+app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 
-app.set(`views`, __dirname + `/templates`);
+app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
 app.use(`/`, mainRouter);
