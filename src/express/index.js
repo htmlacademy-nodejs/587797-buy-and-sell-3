@@ -22,7 +22,13 @@ app.use(`/`, mainRouter);
 app.use(`/my`, myRouter);
 app.use(`/offers`, offersRouter);
 
-app.listen(PORT);
+app.listen(PORT, (error) => {
+  if (error) {
+    console.info(`Ошибка при создании сервера`, error);
+  }
+
+  console.info(`Ожидаю соединений на порт ${PORT}`);
+});
 
 app.use((req, res, next) => {
   res
