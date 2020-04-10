@@ -10,12 +10,13 @@ const offersRouter = require(`./routes/offers`);
 const PORT = 8080;
 const {HttpCode} = require(`../constants`);
 const PUBLIC_DIR = `public`;
+const TEMPLATES_DIR = `templates`;
 
 const app = express();
 
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 
-app.set(`views`, path.resolve(__dirname, `templates`));
+app.set(`views`, path.resolve(__dirname, TEMPLATES_DIR));
 app.set(`view engine`, `pug`);
 
 app.use(`/`, mainRouter);
