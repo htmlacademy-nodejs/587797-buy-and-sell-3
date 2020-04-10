@@ -14,5 +14,8 @@ node_modules/
 # Папка с собранными файлами проекта
 build/
 
+# Markup dir
+markup1
+
 #Mock data file
 mocks.json
