@@ -15,7 +15,7 @@ node_modules/
 build/
 
 # Markup dir
-markup1
+markup
 
 #Mock data file
 mocks.json
