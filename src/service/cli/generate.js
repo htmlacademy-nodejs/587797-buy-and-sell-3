@@ -1,25 +1,21 @@
 'use strict';
 
 const chalk = require(`chalk`);
+const moment = require(`moment`);
 const {nanoid} = require(`nanoid`);
 const {
   getRandomInt,
-  shuffleArray
+  shuffleArray,
+  readContent,
 } = require(`../../utils`);
 
 const {
   DEFAULT_OFFER_NUMBER,
   MOCK_FILE_PATH,
   MAX_MOCK_OBJECT_NUMBER,
-  ExitCode
+  ExitCode,
+  FilePath
 } = require(`../../constants`);
-
-const FilePath = {
-  SENTENCES: `./data/sentences.txt`,
-  TITLES: `./data/titles.txt`,
-  CATEGORIES: `./data/categories.txt`,
-  COMMENTS_TEXT: `./data/comments_text.txt`
-};
 
 const fs = require(`fs`).promises;
 
@@ -40,18 +36,6 @@ const PictureValue = {
   MAX: 16
 };
 
-const readContent = async (filePath) => {
-  try {
-    const content = await fs.readFile(filePath, `utf8`);
-
-    return content.split(`\n`);
-  } catch (error) {
-    console.error(chalk.red(error));
-
-    return [];
-  }
-};
-
 const generateComments = (count, commentsText) => {
   return Array(count).fill({}).map(() => {
     return {
@@ -59,6 +43,19 @@ const generateComments = (count, commentsText) => {
       text: shuffleArray(commentsText).slice(1, count).join(` `)
     };
   });
+};
+
+const generatePicture = () => {
+  let pictureNumber = getRandomInt(PictureValue.MIN, PictureValue.MAX);
+
+  if (pictureNumber < 10) {
+    pictureNumber = `0${pictureNumber}`;
+  }
+  return `${pictureNumber}`;
+};
+
+const generateDate = () => {
+  return moment().locale(`ru`).format(`DD MMMM YYYY`);
 };
 
 const generateOffers = (offersNumber, titles, categories, sentences, commentsText) => {
@@ -70,9 +67,10 @@ const generateOffers = (offersNumber, titles, categories, sentences, commentsTex
     title: titles[getRandomInt(0, titles.length - 1)],
     description: shuffleArray(sentences).slice(1, SENTENCES_MAX_VALUE).join(` `),
     sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
-    picture: `item${getRandomInt(PictureValue.MIN, PictureValue.MAX)}.jpg`,
-    category: shuffleArray(categories).slice(1, getRandomInt(1, categories.length - 1)),
-    comments: generateComments(getRandomInt(1, 5), commentsText)
+    picture: generatePicture(),
+    categories: shuffleArray(categories).slice(0, getRandomInt(1, 3)),
+    createdAt: generateDate(),
+    comments: generateComments(getRandomInt(1, 5), commentsText),
   }));
 };
 

@@ -1,6 +1,10 @@
 'use strict';
 
+const axios = require(`axios`);
+
 const {Router} = require(`express`);
+
+const {BASE_API_URL} = require(`../../constants`);
 
 const offersRouter = new Router();
 
@@ -19,14 +23,19 @@ offersRouter.get(`/edit/:id`, (req, res) => {
     isAuth: true
   });
 });
-offersRouter.get(`/:id`, (req, res) => {
-  res.render(`offers/ticket`, {
-    isAuth: false,
-    ticket: {
-      img: null
-    },
-    comments: [1]
-  });
+offersRouter.get(`/:id`, async (req, res) => {
+  try {
+    const offerResponse = await axios.get(BASE_API_URL + `/api/offers/${req.params.id}`);
+    const offer = offerResponse.data;
+
+    res.render(`offers/ticket`, {
+      isAuth: false,
+      comments: [1],
+      ticket: offer
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 module.exports = offersRouter;

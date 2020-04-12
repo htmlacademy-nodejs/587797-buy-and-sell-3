@@ -17,5 +17,12 @@ module.exports = {
   },
   ErrorCode: {
     NO_FILE_OR_DIRECTORY: `ENOENT`
-  }
+  },
+  FilePath: {
+    SENTENCES: `./data/sentences.txt`,
+    TITLES: `./data/titles.txt`,
+    CATEGORIES: `./data/categories.txt`,
+    COMMENTS_TEXT: `./data/comments_text.txt`
+  },
+  BASE_API_URL: `http://localhost:3000`
 };
