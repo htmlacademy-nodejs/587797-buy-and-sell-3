@@ -3,21 +3,19 @@
 const chalk = require(`chalk`);
 
 const {Router} = require(`express`);
+const {getCategories} = require(`../repository`);
 
 const {
-  FilePath,
   HttpCode,
   ErrorCode
 } = require(`../../constants`);
-
-const {readContent} = require(`../../utils`);
 
 const categoriesRouter = new Router();
 
 categoriesRouter.get(`/`, async (req, res) => {
   try {
-    const categories = await readContent(FilePath.CATEGORIES);
-    res.json(JSON.stringify(categories));
+    const categories = await getCategories();
+    res.json(categories);
   } catch (error) {
     if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
       res.status(HttpCode.NOT_FOUND).send(`There is no data file`);

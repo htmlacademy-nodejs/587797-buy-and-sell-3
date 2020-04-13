@@ -4,6 +4,7 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const {Router} = require(`express`);
+const {getOffersStorage} = require(`../repository`);
 
 const {
   MOCK_FILE_PATH,
@@ -19,9 +20,11 @@ const COMMENTS_REQUIRED_FIELDS = [`comment`];
 offersRouter
   .get(`/:id`, async (req, res) => {
     try {
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      res.json(mocks.filter((mock) => mock.id === req.params.id)[0]);
+      const offersStorage = await getOffersStorage();
+      console.log(offersStorage);
+      // const mocks = await getOffers();
+      const offers = offersStorage.getOffers();
+      res.json(offers.filter((mock) => mock.id === req.params.id)[0]);
     } catch (error) {
       if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
         res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
@@ -42,11 +45,20 @@ offersRouter
     }
   })
   .delete(`/:id`, async (req, res) => {
-    if (Math.round(Math.random())) {
-      res.status(HttpCode.SUCCESS_DELETE).send();
+    const offerId = req.params.id;
+    const offersStorage = await getOffersStorage();
+    offersStorage.getOffers();
+    // let offers = offersStorage.delete();
+    // const foundOffer = offers.find((offer) => offer.id === offerId);
+
+    if (offersStorage.delete()) {
+      offersStorage.getOffers();
+      res.status(HttpCode.NOT_FOUND).send(`There is no offer with id ${offerId}`);
     } else {
-      res.status(HttpCode.NOT_FOUND).send(`Something wrong`);
+      offersStorage.getOffers();
+      res.status(HttpCode.SUCCESS_DELETE).send();
     }
+
   });
 
 offersRouter
