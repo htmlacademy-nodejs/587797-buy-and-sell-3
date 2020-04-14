@@ -10,7 +10,8 @@ const {
 class OffersRepository {
   constructor() {
     this.offers = JSON.parse(fs.readFileSync(MOCK_FILE_PATH));
-    this.requiredFields = [`title`, `description`, `category`, `price`, `type`, `avatar`];
+    this.offerRequiredFields = [`title`, `description`, `category`, `price`, `type`, `avatar`];
+    this.commentRequiredFields = [`comment`];
   }
 
   getById(offerId) {
@@ -56,7 +57,8 @@ class OffersRepository {
       this.offers = this.offers.filter((offer) => offer.id !== offerId);
 
       return {
-        isSuccess: true
+        isSuccess: true,
+        body: null
       };
     }
   }
@@ -116,16 +118,121 @@ class OffersRepository {
     };
   }
 
+  getComments(offerId) {
+    const response = this.getById(offerId);
+
+    if (!response.isSuccess) {
+      return response;
+    }
+
+    return {
+      isSuccess: true,
+      body: response.body.comments
+    };
+  }
+
+  deleteComment(offerId, commentId) {
+    const response = this.getById(offerId);
+
+    if (!response.isSuccess) {
+      return response;
+    }
+
+    const offer = response.body;
+    const comments = offer.comments;
+
+    if (comments.length === 0) {
+      return {
+        isSuccess: false,
+        body: {
+          message: `There is no comments yet`
+        }
+      };
+    }
+
+    const foundComment = comments.find((comment) => comment.id === commentId);
+
+    if (foundComment === undefined) {
+      return {
+        isSuccess: false,
+        body: {
+          message: `There is no comment with id #${commentId}`
+        }
+      };
+    }
+
+    const newComments = comments.filter((comment) => comment.id !== commentId);
+    const newOffer = Object.assign({}, offer, {comments: newComments});
+    const deleteResponse = this.delete(offerId);
+
+    if (!deleteResponse.isSuccess) {
+      return deleteResponse;
+    }
+
+    this.offers.push(newOffer);
+
+    return {
+      isSuccess: true,
+      body: null
+    };
+  }
+
+  createComment(offerId, data) {
+    const fieldsKeys = Object.keys(data);
+
+    if (!this._isValidCommentPostData(data)) {
+      return {
+        isSuccess: false,
+        body: {
+          message: `Invalid form: ${fieldsKeys}`
+        }
+      };
+    }
+
+    const getResponse = this.getById(offerId);
+
+    if (!getResponse.isSuccess) {
+      return getResponse;
+    }
+
+    const offer = getResponse.body;
+    const newComment = Object.assign({}, data, {id: nanoid()});
+
+    offer.comments.push(newComment);
+
+    return {
+      isSuccess: true,
+      body: newComment
+    };
+  }
+
+  search(query) {
+    const offers = this.offers;
+
+    const foundOffers = offers.filter((offer) => offer.title.indexOf(query) !== -1);
+
+    return {
+      isSuccess: true,
+      body: foundOffers
+    };
+  }
+
   _isValidPostData(data) {
     const fieldsKeys = Object.keys(data);
 
-    return this.requiredFields.every((requiredField) => fieldsKeys.includes(requiredField));
+    return this.offerRequiredFields.every((requiredField) => fieldsKeys.includes(requiredField));
   }
 
   _isValidPutData(data) {
     const fieldsKeys = Object.keys(data);
 
-    return fieldsKeys.every((requiredField) => this.requiredFields.includes(requiredField));
+    return fieldsKeys.every((requiredField) => this.offerRequiredFields.includes(requiredField));
+  }
+
+  _isValidCommentPostData(data) {
+    const fieldsKeys = Object.keys(data);
+
+    return this.commentRequiredFields.every((requiredField) => fieldsKeys.includes(requiredField));
   }
 }
 
