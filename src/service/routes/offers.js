@@ -4,7 +4,7 @@ const fs = require(`fs`).promises;
 const chalk = require(`chalk`);
 
 const {Router} = require(`express`);
-const {getOffersStorage} = require(`../repository`);
+const OffersRepository = require(`../repositories/offersRepository`);
 
 const {
   MOCK_FILE_PATH,
@@ -14,49 +14,38 @@ const {
 
 const offersRouter = new Router();
 
-const TICKET_REQUIRED_FIELDS = [`title`, `comment`, `category`, `price`, `action`];
+const TICKET_REQUIRED_FIELDS = [`title`, `description`, `category`, `price`, `action`];
 const COMMENTS_REQUIRED_FIELDS = [`comment`];
 
 offersRouter
-  .get(`/:id`, async (req, res) => {
-    try {
-      const offersStorage = await getOffersStorage();
-      console.log(offersStorage);
-      // const mocks = await getOffers();
-      const offers = offersStorage.getOffers();
-      res.json(offers.filter((mock) => mock.id === req.params.id)[0]);
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
-
-      console.info(chalk.red(error));
-    }
-  })
-  .put(`/:id`, async (req, res) => {
-    const fieldsKeys = Object.keys(req.body);
-
-    if (TICKET_REQUIRED_FIELDS.every((requiredField) => fieldsKeys.includes(requiredField))) {
-      res.status(HttpCode.SUCCESS_POST).send(Object.keys(req.body));
-    } else {
-      res.status(HttpCode.WRONG_QUERY).send(`Invalid form: ${Object.keys(req.body)}`);
-    }
-  })
-  .delete(`/:id`, async (req, res) => {
+  .get(`/:id`, (req, res) => {
     const offerId = req.params.id;
-    const offersStorage = await getOffersStorage();
-    offersStorage.getOffers();
-    // let offers = offersStorage.delete();
-    // const foundOffer = offers.find((offer) => offer.id === offerId);
+    const response = OffersRepository.getById(offerId);
 
-    if (offersStorage.delete()) {
-      offersStorage.getOffers();
-      res.status(HttpCode.NOT_FOUND).send(`There is no offer with id ${offerId}`);
+    if (response.isSuccess) {
+      res.json(response.body);
     } else {
-      offersStorage.getOffers();
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
+    }
+  })
+  .put(`/:id`, (req, res) => {
+    const offerId = req.params.id;
+    const response = OffersRepository.put(offerId, req.body);
+
+    if (response.isSuccess) {
+      res.status(HttpCode.SUCCESS_POST).send(response.body);
+    } else {
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
+    }
+  })
+  .delete(`/:id`, (req, res) => {
+    const offerId = req.params.id;
+    const response = OffersRepository.delete(offerId);
+
+    if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_DELETE).send();
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
 
   });
@@ -104,28 +93,22 @@ offersRouter
   });
 
 offersRouter
-  .get(`/`, async (req, res) => {
-    try {
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      res.json(mocks);
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
+  .get(`/`, (req, res) => {
+    const response = OffersRepository.getAll();
 
-      console.info(chalk.red(error));
+    if (response.isSuccess) {
+      res.json(response.body);
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
   })
   .post(`/`, async (req, res) => {
-    const fieldsKeys = Object.keys(req.body);
+    const response = OffersRepository.create(req.body);
 
-    if (TICKET_REQUIRED_FIELDS.every((requiredField) => fieldsKeys.includes(requiredField))) {
-      res.status(HttpCode.SUCCESS_POST).send(Object.keys(req.body));
+    if (response.isSuccess) {
+      res.status(HttpCode.SUCCESS_POST).send(response.body);
     } else {
-      res.status(HttpCode.WRONG_QUERY).send(`Invalid form: ${Object.keys(req.body)}`);
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
     }
   });
 

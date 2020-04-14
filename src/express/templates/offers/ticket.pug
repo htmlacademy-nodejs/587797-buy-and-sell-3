@@ -12,7 +12,7 @@ block content
           h2.ticket__title=ticket.title
           .ticket__header
             p.ticket__price
-              span.js-sum=ticket.sum
+              span.js-sum=ticket.price
               |  ₽
             p.ticket__action=`${ticket.type === 'offer' ? 'Продам' : 'Куплю'}`
           .ticket__desc
