@@ -66,7 +66,7 @@ const generateOffers = (offersNumber, titles, categories, sentences, commentsTex
     type: OfferType[offerTypes[getRandomInt(0, offerTypes.length - 1)]],
     title: titles[getRandomInt(0, titles.length - 1)],
     description: shuffleArray(sentences).slice(1, SENTENCES_MAX_VALUE).join(` `),
-    sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
+    price: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
     picture: generatePicture(),
     categories: shuffleArray(categories).slice(0, getRandomInt(1, 3)),
     createdAt: generateDate(),

@@ -1,38 +1,29 @@
 'use strict';
 
-const fs = require(`fs`).promises;
-const chalk = require(`chalk`);
-
 const {Router} = require(`express`);
 
+const OffersRepository = require(`../repositories/offersRepository`);
+
 const {
-  MOCK_FILE_PATH,
   HttpCode,
-  ErrorCode
 } = require(`../../constants`);
 
 const searchRouter = new Router();
 
 searchRouter
   .get(`/`, async (req, res) => {
-    try {
-      const {query} = req.query;
+    const {query} = req.query;
 
-      if (query === undefined || query.length === 0) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no search param`);
-      }
+    if (query === undefined || query.length === 0) {
+      res.status(HttpCode.NOT_FOUND).send(`There is no search param`);
+    }
 
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      res.json(mocks.filter((mock) => mock.title.indexOf(query) !== -1));
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
+    const response = OffersRepository.search(query);
 
-      console.info(chalk.red(error));
+    if (!response.isSuccess) {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
+    } else {
+      res.json(response.body);
     }
   });
 

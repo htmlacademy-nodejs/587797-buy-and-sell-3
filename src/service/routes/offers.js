@@ -1,119 +1,99 @@
 'use strict';
 
-const fs = require(`fs`).promises;
-const chalk = require(`chalk`);
-
 const {Router} = require(`express`);
+const OffersRepository = require(`../repositories/offersRepository`);
 
 const {
-  MOCK_FILE_PATH,
   HttpCode,
-  ErrorCode
 } = require(`../../constants`);
 
 const offersRouter = new Router();
 
-const TICKET_REQUIRED_FIELDS = [`title`, `comment`, `category`, `price`, `action`];
-const COMMENTS_REQUIRED_FIELDS = [`comment`];
-
 offersRouter
-  .get(`/:id`, async (req, res) => {
-    try {
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      res.json(mocks.filter((mock) => mock.id === req.params.id)[0]);
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
+  .get(`/:offerId`, (req, res) => {
+    const offerId = req.params.offerId;
+    const response = OffersRepository.getById(offerId);
 
-      console.info(chalk.red(error));
-    }
-  })
-  .put(`/:id`, async (req, res) => {
-    const fieldsKeys = Object.keys(req.body);
-
-    if (TICKET_REQUIRED_FIELDS.every((requiredField) => fieldsKeys.includes(requiredField))) {
-      res.status(HttpCode.SUCCESS_POST).send(Object.keys(req.body));
+    if (response.isSuccess) {
+      res.json(response.body);
     } else {
-      res.status(HttpCode.WRONG_QUERY).send(`Invalid form: ${Object.keys(req.body)}`);
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
   })
-  .delete(`/:id`, async (req, res) => {
-    if (Math.round(Math.random())) {
+  .put(`/:offerId`, (req, res) => {
+    const offerId = req.params.offerId;
+    const response = OffersRepository.put(offerId, req.body);
+
+    if (response.isSuccess) {
+      res.status(HttpCode.SUCCESS_POST).send(response.body);
+    } else {
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
+    }
+  })
+  .delete(`/:offerId`, (req, res) => {
+    const offerId = req.params.offerId;
+    const response = OffersRepository.delete(offerId);
+
+    if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_DELETE).send();
     } else {
-      res.status(HttpCode.NOT_FOUND).send(`Something wrong`);
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
+
   });
 
 offersRouter
-  .get(`/:id/comments`, async (req, res) => {
-    try {
-      const ticketId = req.params.id;
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      const ticketData = mocks.filter((mock) => mock.id === ticketId);
+  .get(`/:offerId/comments`, async (req, res) => {
+    const offerId = req.params.offerId;
 
-      if (ticketData.length === 0) {
-        res.status(HttpCode.NOT_FOUND).send(`No such ticket with id #${ticketId}`);
-      } else {
-        res.json(ticketData[0].comments);
-      }
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
+    const response = OffersRepository.getComments(offerId);
 
-      console.info(chalk.red(error));
+    if (response.isSuccess) {
+      res.json(response.body);
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
   })
   .post(`/:offerId/comments`, async (req, res) => {
-    const fieldsKeys = Object.keys(req.body);
+    const offerId = req.params.offerId;
 
-    if (COMMENTS_REQUIRED_FIELDS.every((requiredField) => fieldsKeys.includes(requiredField))) {
-      res.status(HttpCode.SUCCESS_POST).send(Object.keys(req.body));
+    const response = OffersRepository.createComment(offerId, req.body);
+
+    if (!response.isSuccess) {
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
     } else {
-      res.status(HttpCode.WRONG_QUERY).send(`Invalid form: ${Object.keys(req.body)}`);
+      res.status(HttpCode.SUCCESS_POST).send(response.body);
     }
   })
   .delete(`/:offerId/comments/:commentId`, async (req, res) => {
-    // const {offerId, commentId} = req.params;
+    const {offerId, commentId} = req.params;
 
-    if (Math.round(Math.random())) {
-      res.status(HttpCode.SUCCESS_DELETE).send();
+    const response = OffersRepository.deleteComment(offerId, commentId);
+
+    if (!response.isSuccess) {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     } else {
-      res.status(HttpCode.NOT_FOUND).send(`Something wrong`);
+      res.status(HttpCode.SUCCESS_DELETE).send();
     }
   });
 
 offersRouter
-  .get(`/`, async (req, res) => {
-    try {
-      const fileContent = await fs.readFile(MOCK_FILE_PATH);
-      const mocks = JSON.parse(fileContent);
-      res.json(mocks);
-    } catch (error) {
-      if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-        res.status(HttpCode.NOT_FOUND).send(`There is no data file`);
-      } else {
-        res.status(HttpCode.INTERNAL_ERROR).send(`Internal error`);
-      }
+  .get(`/`, (req, res) => {
+    const response = OffersRepository.getAll();
 
-      console.info(chalk.red(error));
+    if (response.isSuccess) {
+      res.json(response.body);
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
   })
   .post(`/`, async (req, res) => {
-    const fieldsKeys = Object.keys(req.body);
+    const response = OffersRepository.create(req.body);
 
-    if (TICKET_REQUIRED_FIELDS.every((requiredField) => fieldsKeys.includes(requiredField))) {
-      res.status(HttpCode.SUCCESS_POST).send(Object.keys(req.body));
+    if (response.isSuccess) {
+      res.status(HttpCode.SUCCESS_POST).send(response.body);
     } else {
-      res.status(HttpCode.WRONG_QUERY).send(`Invalid form: ${Object.keys(req.body)}`);
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
     }
   });
 
