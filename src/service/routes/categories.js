@@ -9,7 +9,7 @@ const {
 
 const categoriesRouter = new Router();
 
-categoriesRouter.get(`/`, async (req, res) => {
+categoriesRouter.get(`/`, (req, res) => {
   const response = CategoriesRepository.getAll();
 
   if (response.isSuccess) {
