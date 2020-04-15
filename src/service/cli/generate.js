@@ -1,21 +1,21 @@
 'use strict';
 
 const chalk = require(`chalk`);
+const moment = require(`moment`);
+const {nanoid} = require(`nanoid`);
 const {
   getRandomInt,
-  shuffleArray
+  shuffleArray,
+  readContent,
 } = require(`../../utils`);
 
 const {
   DEFAULT_OFFER_NUMBER,
   MOCK_FILE_PATH,
   MAX_MOCK_OBJECT_NUMBER,
-  ExitCode
+  ExitCode,
+  FilePath
 } = require(`../../constants`);
-
-const FILE_SENTENCES_PATH = `./data/sentences.txt`;
-const FILE_TITLES_PATH = `./data/titles.txt`;
-const FILE_CATEGORIES_PATH = `./data/categories.txt`;
 
 const fs = require(`fs`).promises;
 
@@ -36,28 +36,41 @@ const PictureValue = {
   MAX: 16
 };
 
-const readContent = async (filePath) => {
-  try {
-    const content = await fs.readFile(filePath, `utf8`);
-
-    return content.split(`\n`);
-  } catch (error) {
-    console.error(chalk.red(error));
-
-    return [];
-  }
+const generateComments = (count, commentsText) => {
+  return Array(count).fill({}).map(() => {
+    return {
+      id: nanoid(),
+      text: shuffleArray(commentsText).slice(1, count).join(` `)
+    };
+  });
 };
 
-const generateOffers = (offersNumber, titles, categories, sentences) => {
+const generatePicture = () => {
+  let pictureNumber = getRandomInt(PictureValue.MIN, PictureValue.MAX);
+
+  if (pictureNumber < 10) {
+    pictureNumber = `0${pictureNumber}`;
+  }
+  return `${pictureNumber}`;
+};
+
+const generateDate = () => {
+  return moment().locale(`ru`).format(`DD MMMM YYYY`);
+};
+
+const generateOffers = (offersNumber, titles, categories, sentences, commentsText) => {
   const offerTypes = Object.keys(OfferType);
 
   return Array(offersNumber).fill({}).map(() => ({
+    id: nanoid(),
     type: OfferType[offerTypes[getRandomInt(0, offerTypes.length - 1)]],
     title: titles[getRandomInt(0, titles.length - 1)],
     description: shuffleArray(sentences).slice(1, SENTENCES_MAX_VALUE).join(` `),
-    sum: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
-    picture: `item${getRandomInt(PictureValue.MIN, PictureValue.MAX)}.jpg`,
-    category: shuffleArray(categories).slice(1, getRandomInt(1, categories.length - 1))
+    price: getRandomInt(SumRestrict.MIN, SumRestrict.MAX),
+    picture: generatePicture(),
+    categories: shuffleArray(categories).slice(0, getRandomInt(1, 3)),
+    createdAt: generateDate(),
+    comments: generateComments(getRandomInt(1, 5), commentsText),
   }));
 };
 
@@ -72,14 +85,15 @@ module.exports = {
       process.exit(ExitCode.SUCCESS);
     }
 
-    const titles = await readContent(FILE_TITLES_PATH);
-    const categories = await readContent(FILE_CATEGORIES_PATH);
-    const sentences = await readContent(FILE_SENTENCES_PATH);
+    const titles = await readContent(FilePath.TITLES);
+    const categories = await readContent(FilePath.CATEGORIES);
+    const sentences = await readContent(FilePath.SENTENCES);
+    const commentsText = await readContent(FilePath.COMMENTS_TEXT);
 
     try {
-      await fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber, titles, categories, sentences)));
+      await fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber, titles, categories, sentences, commentsText)));
     } catch (error) {
-      console.error(chalk.red(`Can't write data to file...`));
+      console.error(chalk.red(`Can't write data to file...`, error));
       process.exit(ExitCode.FAIL);
     }
 

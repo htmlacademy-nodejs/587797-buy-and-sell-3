@@ -48,5 +48,7 @@ app.use((err, req, res, next) => {
       errorClass: `html-server`
     });
 
+  console.log(`Internal error`, err);
+
   next();
 });
