@@ -4,6 +4,7 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const {getLogger} = require(`../logger`);
 const logger = getLogger();
+const pinoMiddleware = require(`express-pino-logger`)({logger});
 
 const offersRouter = require(`../routes/offers`);
 const categoriesRouter = require(`../routes/categories`);
@@ -16,6 +17,7 @@ const {
 
 const app = express();
 
+app.use(pinoMiddleware);
 app.use((req, res, next) => {
   logger.debug(`Start request to url: ${req.url}`);
   next();
