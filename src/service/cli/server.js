@@ -2,7 +2,10 @@
 
 const express = require(`express`);
 const chalk = require(`chalk`);
-const logger = require(`pino`)();
+const logger = require(`pino`)({
+  name: `pino-and-express`,
+  level: process.env.LOG_LEVEL || `info`
+});
 
 const offersRouter = require(`../routes/offers`);
 const categoriesRouter = require(`../routes/categories`);
