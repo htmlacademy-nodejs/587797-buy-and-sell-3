@@ -16,10 +16,11 @@ app.use(`/`, categoriesRouter);
 
 const {
   HttpCode,
+  ContentTypeRegExp
 } = require(`../../constants`);
 
-describe(`test categories route`, () => {
-  test(`test categories GET method success answer`, async () => {
+describe(`test GET api/categories/ route`, () => {
+  test(`test success answer`, async () => {
     const getAllMethodResponse = {
       isSuccess: true,
       body: {
@@ -28,13 +29,13 @@ describe(`test categories route`, () => {
     };
     CategoriesRepository.getAll.mockReturnValue(getAllMethodResponse);
 
-    const res = await request(app).get(`/`).expect(`Content-Type`, /application\/json/);
+    const res = await request(app).get(`/`).expect(`Content-Type`, ContentTypeRegExp.JSON);
 
     expect(res.statusCode).toBe(HttpCode.OK);
     expect(res.body).toStrictEqual(getAllMethodResponse.body);
   });
 
-  test(`test categories GET method 404 answer`, async () => {
+  test(`test 404 answer`, async () => {
     const getAllMethodResponse = {
       isSuccess: false,
       body: {
@@ -43,7 +44,7 @@ describe(`test categories route`, () => {
     };
     CategoriesRepository.getAll.mockReturnValue(getAllMethodResponse);
 
-    const res = await request(app).get(`/`).expect(`Content-Type`, /text\/html/);
+    const res = await request(app).get(`/`).expect(`Content-Type`, ContentTypeRegExp.HTML);
 
     expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
     expect(res.text).toBe(getAllMethodResponse.body.message);
