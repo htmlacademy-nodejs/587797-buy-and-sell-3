@@ -7,9 +7,9 @@
     "test": "npm run eslint",
     "test::rest": "jest",
     "eslint": "eslint --ext .js src/",
-    "start": "LOG_LEVER=error node ./src/service/service.js",
-    "start::debug": "LOG_LEVER=debug node ./src/service/service.js | ./node_modules/.bin/pino-pretty",
-    "server": "nodemon ./src/service/service.js --server 3000",
+    "start": "node ./src/service/service.js",
+    "server": "LOG_LEVEL=error nodemon ./src/service/service.js --server 3000",
+    "server::debug": "LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty",
     "start-front-server": "nodemon ./src/express/index.js"
   },
   "repository": {

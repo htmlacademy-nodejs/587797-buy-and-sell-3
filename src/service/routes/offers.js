@@ -1,5 +1,8 @@
 'use strict';
 
+const {getLogger} = require(`../logger`);
+const logger = getLogger();
+
 const {Router} = require(`express`);
 const OffersRepository = require(`../repositories/offersRepository`);
 
@@ -16,8 +19,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.json(response.body);
+      logger.info(`End request with status code ${HttpCode.OK}`);
     } else {
       res.status(HttpCode.NOT_FOUND).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
     }
   })
   .put(`/:offerId`, (req, res) => {
@@ -26,8 +31,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_POST).send(response.body);
+      logger.info(`End request with status code ${HttpCode.SUCCESS_POST}`);
     } else {
       res.status(HttpCode.WRONG_QUERY).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.WRONG_QUERY}`);
     }
   })
   .delete(`/:offerId`, (req, res) => {
@@ -36,8 +43,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_DELETE).send();
+      logger.info(`End request with status code ${HttpCode.SUCCESS_DELETE}`);
     } else {
       res.status(HttpCode.NOT_FOUND).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
     }
 
   });
@@ -50,8 +59,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.json(response.body);
+      logger.info(`End request with status code ${HttpCode.OK}`);
     } else {
       res.status(HttpCode.NOT_FOUND).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
     }
   })
   .post(`/:offerId/comments`, async (req, res) => {
@@ -61,8 +72,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_POST).send(response.body);
+      logger.info(`End request with status code ${HttpCode.SUCCESS_POST}`);
     } else {
       res.status(HttpCode.WRONG_QUERY).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.WRONG_QUERY}`);
     }
   })
   .delete(`/:offerId/comments/:commentId`, async (req, res) => {
@@ -70,10 +83,12 @@ offersRouter
 
     const response = OffersRepository.deleteComment(offerId, commentId);
 
-    if (!response.isSuccess) {
-      res.status(HttpCode.NOT_FOUND).send(response.body.message);
-    } else {
+    if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_DELETE).send();
+      logger.info(`End request with status code ${HttpCode.SUCCESS_DELETE}`);
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
     }
   });
 
@@ -83,8 +98,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.json(response.body);
+      logger.info(`End request with status code ${HttpCode.OK}`);
     } else {
       res.status(HttpCode.NOT_FOUND).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
     }
   })
   .post(`/`, async (req, res) => {
@@ -92,8 +109,10 @@ offersRouter
 
     if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_POST).send(response.body);
+      logger.info(`End request with status code ${HttpCode.SUCCESS_POST}`);
     } else {
       res.status(HttpCode.WRONG_QUERY).send(response.body.message);
+      logger.error(`End request with error: ${HttpCode.WRONG_QUERY}`);
     }
   });
 
