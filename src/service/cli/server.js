@@ -16,15 +16,15 @@ const {
 
 const app = express();
 
-app.use(express.json());
-app.use(`/api/offers`, offersRouter);
-app.use(`/api/categories`, categoriesRouter);
-app.use(`/api/search`, searchRouter);
-
 app.use((req, res, next) => {
   logger.debug(`Start request to url: ${req.url}`);
   next();
 });
+
+app.use(express.json());
+app.use(`/api/offers`, offersRouter);
+app.use(`/api/categories`, categoriesRouter);
+app.use(`/api/search`, searchRouter);
 
 app.use((req, res) => {
   res
