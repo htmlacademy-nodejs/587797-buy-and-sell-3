@@ -8,8 +8,8 @@
     "test::rest": "jest",
     "eslint": "eslint --ext .js src/",
     "start": "node ./src/service/service.js",
-    "server": "LOG_LEVEL=error nodemon ./src/service/service.js --server 3000",
-    "server::debug": "LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty",
+    "server": "LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty > ./src/service/logs/app.txt 2> ./src/service/logs/errors.txt",
+    "server::debug": "LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty > ./src/service/logs/app.txt 2> ./src/service/logs/errors.txt",
     "start-front-server": "nodemon ./src/express/index.js"
   },
   "repository": {

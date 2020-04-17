@@ -1,8 +1,5 @@
 'use strict';
 
-const {getLogger} = require(`../logger`);
-const logger = getLogger();
-
 const {Router} = require(`express`);
 
 const OffersRepository = require(`../repositories/offersRepository`);
@@ -24,10 +21,8 @@ searchRouter
 
       if (response.isSuccess) {
         res.json(response.body);
-        logger.info(`End request with status code ${HttpCode.OK}`);
       } else {
         res.status(HttpCode.NOT_FOUND).send(response.body.message);
-        logger.error(`End request with error: ${HttpCode.NOT_FOUND}`);
       }
     }
   });
