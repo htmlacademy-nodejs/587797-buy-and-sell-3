@@ -28,5 +28,9 @@ module.exports = {
     CATEGORIES: `./data/categories.txt`,
     COMMENTS_TEXT: `./data/comments_text.txt`
   },
-  BASE_API_URL: `http://localhost:3000`
+  BASE_API_URL: `http://localhost:3000`,
+  ContentTypeRegExp: {
+    HTML: /text\/html/,
+    JSON: /application\/json/
+  }
 };

@@ -59,10 +59,10 @@ offersRouter
 
     const response = OffersRepository.createComment(offerId, req.body);
 
-    if (!response.isSuccess) {
-      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
-    } else {
+    if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_POST).send(response.body);
+    } else {
+      res.status(HttpCode.WRONG_QUERY).send(response.body.message);
     }
   })
   .delete(`/:offerId/comments/:commentId`, async (req, res) => {
@@ -70,10 +70,10 @@ offersRouter
 
     const response = OffersRepository.deleteComment(offerId, commentId);
 
-    if (!response.isSuccess) {
-      res.status(HttpCode.NOT_FOUND).send(response.body.message);
-    } else {
+    if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_DELETE).send();
+    } else {
+      res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
   });
 

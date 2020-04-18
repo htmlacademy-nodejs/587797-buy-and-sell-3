@@ -19,3 +19,6 @@ markup
 
 #Mock data file
 mocks.json
+
+#Logs dir
+src/service/logs
