@@ -10,6 +10,7 @@ const {
 const categoriesRouter = new Router();
 
 categoriesRouter.get(`/`, (req, res) => {
+  throw new Error(`Err`);
   const response = CategoriesRepository.getAll();
 
   if (response.isSuccess) {

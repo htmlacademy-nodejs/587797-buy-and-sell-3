@@ -4,7 +4,7 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const {getLogger} = require(`../logger`);
 const logger = getLogger();
-const pinoMiddleware = require(`express-pino-logger`)({logger});
+// const pinoMiddleware = require(`express-pino-logger`)({logger});
 
 const offersRouter = require(`../routes/offers`);
 const categoriesRouter = require(`../routes/categories`);
@@ -17,7 +17,7 @@ const {
 
 const app = express();
 
-app.use(pinoMiddleware);
+// app.use(pinoMiddleware);
 app.use((req, res, next) => {
   logger.debug(`Start request to url: ${req.url}`);
   next();
@@ -34,6 +34,14 @@ app.use((req, res) => {
     .send(`Not found`);
 
   logger.error(`End request with error: ${res.statusCode}`);
+});
+
+app.use((error, req, res, next) => {
+  res
+    .status(HttpCode.INTERNAL_ERROR)
+    .send(`Internal server error`);
+
+  logger.error(`Internal error: ${error}`);
 });
 
 module.exports = {
