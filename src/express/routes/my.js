@@ -1,12 +1,20 @@
 'use strict';
 
+const axios = require(`axios`);
+
+const {BASE_API_URL} = require(`../../constants`);
+
 const {Router} = require(`express`);
 
 const myRouter = new Router();
 
-myRouter.get(`/`, (req, res) => {
+myRouter.get(`/`, async (req, res) => {
+  const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
+  const tickets = offersResponse.data;
+
   res.render(`my/my-tickets`, {
-    isAuth: true
+    isAuth: true,
+    tickets
   });
 });
 myRouter.get(`/comments`, (req, res) => {

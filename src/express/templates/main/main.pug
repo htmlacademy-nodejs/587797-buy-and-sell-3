@@ -66,7 +66,8 @@ block content
                 .ticket-card__info
                   span.ticket-card__label=`${ticket.type === 'offer' ? 'Продам' : 'Куплю'}`
                   .ticket-card__categories
-                    a(href='/offers/category/1')=ticket.categories.join(`, `)
+                    each category in ticket.categories
+                      a(href='/offers/category/1')=category
                   .ticket-card__header
                     h3.ticket-card__title
                       a(href=`/offers/${ticket.id}`)=ticket.title
