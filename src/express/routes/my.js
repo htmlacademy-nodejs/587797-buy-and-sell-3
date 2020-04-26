@@ -10,17 +10,22 @@ const myRouter = new Router();
 
 myRouter.get(`/`, async (req, res) => {
   const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
-  const tickets = offersResponse.data;
+  const offers = offersResponse.data;
 
   res.render(`my/my-tickets`, {
     isAuth: true,
-    tickets
+    tickets: offers
   });
 });
-myRouter.get(`/comments`, (req, res) => {
+myRouter.get(`/comments`, async (req, res) => {
+  const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
+  const offers = offersResponse.data.slice(0, 3);
+
+  let comments = offers.reduce((accumulator, offer) => accumulator.concat(offer.comments), []);
+
   res.render(`my/comments`, {
     isAuth: true,
-    comments: [1]
+    comments
   });
 });
 
