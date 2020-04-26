@@ -71,7 +71,7 @@ block content
                     h3.ticket-card__title
                       a(href=`/offers/${ticket.id}`)=ticket.title
                     p.ticket-card__price
-                      span.js-sum=new Intl.NumberFormat('ru-RU').format(ticket.sum)
+                      span.js-sum=new Intl.NumberFormat('ru-RU').format(ticket.price)
                       |  ₽
                   .ticket-card__desc
                     p=`${ticket.description.length > 55 ? ticket.description.slice(0, 55) + '...' : ticket.description}`
