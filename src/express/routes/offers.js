@@ -18,10 +18,24 @@ offersRouter.get(`/category/:id`, (req, res) => {
     isAuth: true
   });
 });
-offersRouter.get(`/edit/:id`, (req, res) => {
-  res.render(`offers/ticket-edit`, {
-    isAuth: true
-  });
+offersRouter.get(`/edit/:id`, async (req, res) => {
+  try {
+    const offerResponse = await axios.get(`${BASE_API_URL}/api/offers/${req.params.id}`);
+    const offer = offerResponse.data;
+
+    const categoriesResponse = await axios.get(`${BASE_API_URL}/api/categories`);
+    const categories = categoriesResponse.data;
+
+    console.log(offer);
+
+    res.render(`offers/ticket-edit`, {
+      isAuth: true,
+      ticket: offer,
+      categories
+    });
+  } catch (e) {
+    console.log(e);
+  }
 });
 offersRouter.get(`/:id`, async (req, res) => {
   try {

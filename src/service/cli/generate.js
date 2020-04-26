@@ -27,8 +27,8 @@ const SumRestrict = {
 };
 
 const OfferType = {
-  offer: `offer`,
-  type: `type`
+  BUY: `buy`,
+  SELL: `sell`
 };
 
 const PictureValue = {

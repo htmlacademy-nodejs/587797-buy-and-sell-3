@@ -9,24 +9,32 @@ const {Router} = require(`express`);
 const myRouter = new Router();
 
 myRouter.get(`/`, async (req, res) => {
-  const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
-  const offers = offersResponse.data;
+  try {
+    const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
+    const offers = offersResponse.data;
 
-  res.render(`my/my-tickets`, {
-    isAuth: true,
-    tickets: offers
-  });
+    res.render(`my/my-tickets`, {
+      isAuth: true,
+      tickets: offers
+    });
+  } catch (e) {
+    console.log(e);
+  }
 });
 myRouter.get(`/comments`, async (req, res) => {
-  const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
-  const offers = offersResponse.data.slice(0, 3);
+  try {
+    const offersResponse = await axios.get(`${BASE_API_URL}/api/offers`);
+    const offers = offersResponse.data.slice(0, 3);
 
-  let comments = offers.reduce((accumulator, offer) => accumulator.concat(offer.comments), []);
+    let comments = offers.reduce((accumulator, offer) => accumulator.concat(offer.comments), []);
 
-  res.render(`my/comments`, {
-    isAuth: true,
-    comments
-  });
+    res.render(`my/comments`, {
+      isAuth: true,
+      comments
+    });
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 module.exports = myRouter;
