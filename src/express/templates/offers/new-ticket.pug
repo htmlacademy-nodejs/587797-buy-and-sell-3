@@ -5,7 +5,7 @@ block content
     .ticket-form__wrapper
       h1.ticket-form__title Новая публикация
       .ticket-form__tile
-        form.ticket-form__form.form(action='#', method='post', enctype='multipart/form-data', autocomplete='off')
+        form.ticket-form__form.form(action='/offers/add', method='post', enctype='multipart/form-data', autocomplete='off')
           .ticket-form__avatar-container.js-preview-container
             .ticket-form__avatar.js-preview
             .ticket-form__field-avatar
@@ -16,12 +16,12 @@ block content
           .ticket-form__content
             .ticket-form__row
               .form__field
-                input#ticket-name.js-field(type='text', name='title', required='')
+                input#ticket-name.js-field(type='text', name='title', required='' value='My custom title for test')
                 label(for='ticket-name') Название
                 span Обязательное поле
             .ticket-form__row
               .form__field
-                textarea#comment-field.js-field(name='comment', cols='30', rows='10', maxlength='400', minlength='50')
+                textarea#comment-field.js-field(name='description', cols='30', rows='10', maxlength='400', minlength='50')='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui'
                 label(for='comment-field') Описание
                 span Обязательное поле
             .ticket-form__row
@@ -32,7 +32,7 @@ block content
                 option(value='4') Электроника
             .ticket-form__row
               .form__field.form__field--price
-                input#price-field.js-field.js-price(type='number', name='price', min='1', required='')
+                input#price-field.js-field.js-price(type='number', name='price', min='1', required='' value=4000)
                 label(for='price-field') Цена
                 span Обязательное поле
               .form__switch.switch

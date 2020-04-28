@@ -13,6 +13,11 @@ offersRouter.get(`/add`, (req, res) => {
     isAuth: true
   });
 });
+offersRouter.post(`/add`, async (req, res) => {
+  const requiredFields = [`title`];
+  console.log(req.fields);
+  res.end();
+});
 offersRouter.get(`/category/:id`, (req, res) => {
   res.render(`offers/category`, {
     isAuth: true
