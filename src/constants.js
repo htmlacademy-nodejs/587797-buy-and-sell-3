@@ -8,7 +8,10 @@ module.exports = {
     FAIL: 1
   },
   DEFAULT_OFFER_NUMBER: 1,
-  MOCK_FILE_PATH: `mocks.json`,
+  MockFile: {
+    OFFERS: `offers.json`,
+    CATEGORIES: `categories.json`
+  },
   MAX_MOCK_OBJECT_NUMBER: 1000,
   HttpCode: {
     OK: 200,

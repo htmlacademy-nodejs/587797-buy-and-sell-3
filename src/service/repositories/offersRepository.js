@@ -4,13 +4,13 @@ const fs = require(`fs`);
 const {nanoid} = require(`nanoid`);
 
 const {
-  MOCK_FILE_PATH,
+  MockFile,
 } = require(`../../constants`);
 
 class OffersRepository {
   constructor() {
-    this.offers = JSON.parse(fs.readFileSync(MOCK_FILE_PATH));
-    this.offerRequiredFields = [`title`, `description`, `category`, `price`, `type`, `avatar`];
+    this.offers = JSON.parse(fs.readFileSync(MockFile.OFFERS));
+    this.offerRequiredFields = [`title`, `description`, `categories`, `price`, `type`, `avatar`];
     this.commentRequiredFields = [`comment`];
   }
 

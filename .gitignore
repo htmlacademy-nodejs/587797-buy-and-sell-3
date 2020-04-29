@@ -25,3 +25,4 @@ src/service/logs
 src/express/logs
 
 src/express/tmp
+src/express/avatars

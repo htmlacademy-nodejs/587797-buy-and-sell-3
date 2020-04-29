@@ -1,16 +1,13 @@
 'use strict';
 
+const fs = require(`fs`);
 const {
-  FilePath,
+  MockFile,
 } = require(`../../constants`);
-
-const {
-  readContentSync
-} = require(`../../utils`);
 
 class CategoriesRepository {
   constructor() {
-    this.categories = readContentSync(FilePath.CATEGORIES);
+    this.categories = JSON.parse(fs.readFileSync(MockFile.CATEGORIES));
   }
 
   getAll() {

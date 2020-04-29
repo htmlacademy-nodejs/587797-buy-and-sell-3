@@ -12,9 +12,11 @@ mainRouter.get(`/`, async (req, res) => {
   try {
     const offersResponse = await axios.get(BASE_API_URL + `/api/offers`);
     const tickets = offersResponse.data;
+    const categoriesResponse = await axios.get(BASE_API_URL + `/api/categories`);
+    const categories = categoriesResponse.data;
 
     res.render(`main/main`, {
-      categories: [],
+      categories,
       newTickets: tickets,
       mostCommentedTickets: tickets.sort((a, b) => b.comments.length - a.comments.length)
     });
