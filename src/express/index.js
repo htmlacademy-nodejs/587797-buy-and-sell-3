@@ -3,6 +3,8 @@
 const path = require(`path`);
 const express = require(`express`);
 const formiddableMiddleware = require(`express-formidable`);
+const {getLogger} = require(`./logger`);
+const logger = getLogger();
 
 const mainRouter = require(`./routes/main`);
 const myRouter = require(`./routes/my`);
@@ -29,22 +31,14 @@ app.use(`/`, mainRouter);
 app.use(`/my`, myRouter);
 app.use(`/offers`, offersRouter);
 
-app.listen(PORT, (error) => {
-  if (error) {
-    console.info(`Ошибка при создании сервера`, error);
-  }
-
-  console.info(`Ожидаю соединений на порт ${PORT}`);
-});
-
 app.use((req, res, next) => {
+  logger.error(`404 error`);
+
   res
     .status(HttpCode.NOT_FOUND)
     .render(`errors/400`, {
       errorClass: `html-not-found`
     });
-
-  next();
 });
 
 app.use((err, req, res, next) => {
@@ -54,7 +48,13 @@ app.use((err, req, res, next) => {
       errorClass: `html-server`
     });
 
-  console.log(`Internal error`, err);
+  logger.error(`Internal error: ${err}`);
+});
 
-  next();
+app.listen(PORT, (error) => {
+  if (error) {
+    logger.error(`Ошибка при создании сервера`, error);
+  }
+
+  logger.info(`Ожидаю соединений на порт ${PORT}`);
 });

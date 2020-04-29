@@ -22,5 +22,6 @@ mocks.json
 
 #Logs dir
 src/service/logs
+src/express/logs
 
 src/express/tmp

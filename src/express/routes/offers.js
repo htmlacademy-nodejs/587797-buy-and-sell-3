@@ -4,7 +4,10 @@ const axios = require(`axios`);
 
 const {Router} = require(`express`);
 
-const {BASE_API_URL} = require(`../../constants`);
+const {
+  BASE_API_URL,
+  HttpCode
+} = require(`../../constants`);
 
 const offersRouter = new Router();
 
@@ -23,7 +26,7 @@ offersRouter.get(`/category/:id`, (req, res) => {
     isAuth: true
   });
 });
-offersRouter.get(`/edit/:id`, async (req, res) => {
+offersRouter.get(`/edit/:id`, async (req, res, next) => {
   try {
     const offerResponse = await axios.get(`${BASE_API_URL}/api/offers/${req.params.id}`);
     const offer = offerResponse.data;
@@ -31,18 +34,20 @@ offersRouter.get(`/edit/:id`, async (req, res) => {
     const categoriesResponse = await axios.get(`${BASE_API_URL}/api/categories`);
     const categories = categoriesResponse.data;
 
-    console.log(offer);
-
     res.render(`offers/ticket-edit`, {
       isAuth: true,
       ticket: offer,
       categories
     });
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    if (error.response.status === HttpCode.NOT_FOUND) {
+      next();
+    } else {
+      next(error);
+    }
   }
 });
-offersRouter.get(`/:id`, async (req, res) => {
+offersRouter.get(`/:id`, async (req, res, next) => {
   try {
     const offerResponse = await axios.get(BASE_API_URL + `/api/offers/${req.params.id}`);
     const offer = offerResponse.data;
@@ -53,7 +58,7 @@ offersRouter.get(`/:id`, async (req, res) => {
       ticket: offer
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 });
 
