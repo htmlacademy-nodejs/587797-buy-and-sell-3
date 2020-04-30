@@ -2,8 +2,12 @@
 
 const fs = require(`fs`);
 const axios = require(`axios`);
-const {nanoid} = require(`nanoid`);
 const path = require(`path`);
+const multer = require(`multer`);
+const upload = multer({dest: path.resolve(__dirname, `../tmp`)});
+const mime = require(`mime/lite`);
+
+const AddOfferError = require(`../errors/add-offer-error`);
 
 const {getLogger} = require(`../logger`);
 const logger = getLogger();
@@ -12,7 +16,8 @@ const {Router} = require(`express`);
 
 const {
   BASE_API_URL,
-  HttpCode
+  HttpCode,
+  ErrorCode
 } = require(`../../constants`);
 
 const offersRouter = new Router();
@@ -24,82 +29,86 @@ offersRouter.get(`/add`, async (req, res) => {
     formData: {}
   });
 });
-offersRouter.post(`/add`, async (req, res, next) => {
-  const requiredFields = [`title`, `description`, `categories`, `price`, `type`];
-  const keysFromForm = Object.keys(req.fields);
-  console.log(req.fields);
-
-  const {type, size, path: filePath, name} = req.files.avatar;
-  const allowTypes = [`image/jpeg`, `image/png`];
-
-  if (size === 0 || !allowTypes.includes(type)) {
-    logger.error(`Empty file or bad mime type. Size ${size}, mime: ${type}`);
-    fs.unlink(filePath);
-
-    res.render(`offers/new-ticket`, {
-      isAuth: true,
-      categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
-      formData: req.fields
-    });
-  }
-
-  const newFileName = nanoid();
-  console.log(req.files.avatar);
-
+offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
   try {
-    let extension = ``;
+    const requiredFields = [`title`, `description`, `categories`, `price`, `type`];
+    const keysFromForm = Object.keys(req.body);
 
-    switch (true) {
-      case type === `image/png`:
-        extension = `.png`;
+    const {mimetype, size, path: filePath, originalname, filename} = req.file;
+    const allowTypes = [`image/jpeg`, `image/png`];
 
-        break;
-      case type === `image/jpeg`:
-        extension = `.jpg`;
+    const unlinkFile = async (pathToFile) => {
+      await fs.unlink(pathToFile, (error) => {
+        if (error) {
+          if (error.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
+            logger.info(`File wasn't created`);
+          } else {
+            logger.error(error);
+          }
+        } else {
+          logger.info(`File successfully deleted`);
+        }
+      });
+    };
 
-        break;
-      default:
-        throw new Error(`Unhandled file extension. File: ${name}`);
+    if (size === 0 || !allowTypes.includes(mimetype)) {
+      logger.error(`Empty file or bad mime type. Size ${size}, mimetype: ${mimetype}`);
+      await unlinkFile(filePath);
+
+      throw new AddOfferError();
     }
 
-    await fs.rename(filePath, path.resolve(__dirname, `../avatars/${newFileName}${extension}`), (error) => {
-      if (error) {
-        throw error;
+    const newFileName = `${filename}.${mime.getExtension(mimetype)}`;
+    const newFilePath = path.resolve(__dirname, `../avatars/${newFileName}`);
+
+    try {
+      await fs.rename(filePath, newFilePath, (error) => {
+        if (error) {
+          throw error;
+        }
+
+        logger.info(`File successfully renamed. Original filename: ${originalname}, generated filename: ${newFileName}`);
+      });
+    } catch (error) {
+      logger.error(`Can't move file. Original filename: ${originalname}, generated filename: ${newFileName}. Error ${error}`);
+
+      throw new AddOfferError();
+    }
+
+    const areAllRequiredFieldsExist = requiredFields.every((requiredField) => keysFromForm.includes(requiredField));
+
+    if (!areAllRequiredFieldsExist) {
+      logger.error(`Not all required fields are presented. Fields: ${keysFromForm.toString()}`);
+      await unlinkFile(newFilePath);
+
+      throw new AddOfferError();
+    }
+
+    logger.info(`Form is valid. Send post request to record data`);
+
+    try {
+      const postResponse = await axios
+        .post(`${BASE_API_URL}/api/offers`, Object.assign({}, req.body, {avatar: newFileName}));
+
+      logger.info(`Response status is ${postResponse.status}`);
+      if (postResponse.status === HttpCode.SUCCESS_POST) {
+        res.redirect(`/my`);
       }
-
-      logger.info(`File successfully renamed. Original filename: ${name}, generated filename: ${newFileName}`);
-    });
+    } catch (error) {
+      await unlinkFile(newFilePath);
+      logger.error(error);
+      throw new Error(`Can't save post data. Status: ${error.response.status}, message: ${error.response.data}`);
+    }
   } catch (error) {
-    logger.error(`Can't move file. Original filename: ${name}, generated filename: ${newFileName}. Error ${error}`);
-
-    return res.render(`offers/new-ticket`, {
-      isAuth: true,
-      categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
-      formData: req.fields
-    });
-  }
-
-  const areAllRequiredFieldsExist = requiredFields.every((requiredField) => keysFromForm.includes(requiredField));
-
-  if (!areAllRequiredFieldsExist) {
-    logger.error(`Not all required fields are presented. Fields: ${keysFromForm.toString()}`);
-
-    return res.render(`offers/new-ticket`, {
-      isAuth: true,
-      categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
-      formData: req.fields
-    });
-  }
-
-  logger.info(`Form is valid. Send post request to record data`);
-
-  const postResponse = await axios
-    .post(`${BASE_API_URL}/api/offers`, Object.assign({}, req.fields, {avatar: newFileName}));
-
-  if (postResponse.status === HttpCode.SUCCESS_POST) {
-    res.redirect(`/my`);
-  } else {
-    next(new Error(`Bad response status. ${postResponse.status}`));
+    if (error instanceof AddOfferError) {
+      res.render(`offers/new-ticket`, {
+        isAuth: true,
+        categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
+        formData: req.body
+      });
+    } else {
+      next(error.stack);
+    }
   }
 });
 offersRouter.get(`/category/:id`, (req, res) => {

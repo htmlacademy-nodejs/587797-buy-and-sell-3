@@ -2,7 +2,6 @@
 
 const path = require(`path`);
 const express = require(`express`);
-const formiddableMiddleware = require(`express-formidable`);
 const {getLogger} = require(`./logger`);
 const logger = getLogger();
 
@@ -16,11 +15,6 @@ const PUBLIC_DIR = `public`;
 const TEMPLATES_DIR = `templates`;
 
 const app = express();
-app.use(formiddableMiddleware({
-  encoding: `utf-8`,
-  uploadDir: path.resolve(__dirname, `tmp`),
-  multiples: false
-}));
 
 app.use(express.static(path.resolve(__dirname, PUBLIC_DIR)));
 

@@ -89,6 +89,7 @@ offersRouter
   })
   .post(`/`, async (req, res) => {
     const response = OffersRepository.create(req.body);
+    console.log(response.body.message);
 
     if (response.isSuccess) {
       res.status(HttpCode.SUCCESS_POST).send(response.body);
