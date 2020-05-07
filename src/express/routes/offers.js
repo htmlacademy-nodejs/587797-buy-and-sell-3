@@ -6,8 +6,6 @@ const path = require(`path`);
 const multer = require(`multer`);
 const mime = require(`mime/lite`);
 
-const AddOfferError = require(`../errors/add-offer-error`);
-
 const {getLogger} = require(`../logger`);
 const logger = getLogger();
 
@@ -37,8 +35,8 @@ offersRouter.get(`/add`, async (req, res) => {
 });
 offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
   try {
-    console.log(req.body);
-    console.log(req.file);
+    logger.debug({message: `Got body`, content: req.body});
+    logger.debug({message: `Got file`, content: req.file});
 
     const requiredFields = [`title`, `description`, `categories`, `price`, `type`];
     const keysFromForm = Object.keys(req.body);
@@ -69,19 +67,22 @@ offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
       logger.error(`Empty file or bad mime type. Size ${size}, mimetype: ${mimeType}`);
       await unlinkFile(filePath);
 
-      throw new AddOfferError();
+      res.render(`offers/new-ticket`, {
+        isAuth: true,
+        categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
+        formData: req.body
+      });
+
+      return;
     }
 
     const newFileName = `${generatedName}.${mime.getExtension(mimeType)}`;
     const newFilePath = path.resolve(ITEMS_PICTURES_DIR, newFileName);
 
-
-    console.log(newFilePath);
     await fs.rename(filePath, newFilePath, (fileError) => {
       if (fileError) {
         logger.error(`Can't move file. Original filename: ${originalName}, generated filename: ${newFileName}. Error ${fileError}`);
         next(fileError);
-        // throw new AddOfferError();
       }
 
       logger.info(`File successfully renamed. Original filename: ${originalName}, generated filename: ${newFileName}`);
@@ -93,7 +94,13 @@ offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
       logger.error(`Not all required fields are presented. Fields from form: ${keysFromForm.toString()}. Required fields: ${requiredFields.toString()}`);
       await unlinkFile(newFilePath);
 
-      throw new AddOfferError();
+      res.render(`offers/new-ticket`, {
+        isAuth: true,
+        categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
+        formData: req.body
+      });
+
+      return;
     }
 
     logger.info(`Form is valid. Send post request to record data`);
@@ -112,15 +119,7 @@ offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
       throw new Error(`Can't save post data. Status: ${postError.response.status}, message: ${postError.response.data}`);
     }
   } catch (error) {
-    if (error instanceof AddOfferError) {
-      res.render(`offers/new-ticket`, {
-        isAuth: true,
-        categories: (await axios.get(`${BASE_API_URL}/api/categories`)).data,
-        formData: req.body
-      });
-    } else {
-      next(error.stack);
-    }
+    next(error.stack);
   }
 });
 offersRouter.get(`/category/:id`, (req, res) => {
