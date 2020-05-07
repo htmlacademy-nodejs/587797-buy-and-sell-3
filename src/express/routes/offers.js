@@ -3,9 +3,8 @@
 const fs = require(`fs`);
 const axios = require(`axios`);
 const path = require(`path`);
-const formidable = require(`formidable`);
+const multer = require(`multer`);
 const mime = require(`mime/lite`);
-const {nanoid} = require(`nanoid`);
 
 const AddOfferError = require(`../errors/add-offer-error`);
 
@@ -20,6 +19,13 @@ const {
   ErrorCode
 } = require(`../../constants`);
 
+const {
+  ITEMS_PICTURES_DIR,
+  TMP_DIR
+} = require(`../constants`);
+
+const upload = multer({dest: TMP_DIR});
+
 const offersRouter = new Router();
 
 offersRouter.get(`/add`, async (req, res) => {
@@ -29,96 +35,82 @@ offersRouter.get(`/add`, async (req, res) => {
     formData: {}
   });
 });
-offersRouter.post(`/add`, async (req, res, next) => {
+offersRouter.post(`/add`, upload.single(`avatar`), async (req, res, next) => {
   try {
-    console.log(req.field);
-    console.log(req.files);
-    const form = formidable({
-      encoding: `utf-8`,
-      uploadDir: path.resolve(__dirname, `../tmp`),
-      multiples: false
-    });
+    console.log(req.body);
+    console.log(req.file);
 
-    await form.parse(req, async (error, fields, files) => {
-      if (error) {
-        next(error);
+    const requiredFields = [`title`, `description`, `categories`, `price`, `type`];
+    const keysFromForm = Object.keys(req.body);
 
-        return;
-      }
+    const {
+      mimetype: mimeType,
+      size,
+      path: filePath,
+      originalname: originalName,
+      filename: generatedName
+    } = req.file;
 
-      logger.info(fields);
-      logger.info(files);
-
-      const requiredFields = [`title`, `description`, `categories`, `price`, `type`];
-      const keysFromForm = Object.keys(fields);
-
-      const generatedName = nanoid();
-      const {type: mimetype, size, path: filePath, name: originalName} = files.avatar;
-      const allowTypes = [`image/jpeg`, `image/png`];
-
-      const unlinkFile = async (pathToFile) => {
-        await fs.unlink(pathToFile, (fileError) => {
-          if (fileError) {
-            if (fileError.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
-              logger.info(`File wasn't created`);
-            } else {
-              logger.error(fileError);
-            }
+    const unlinkFile = async (pathToFile) => {
+      await fs.unlink(pathToFile, (fileError) => {
+        if (fileError) {
+          if (fileError.code === ErrorCode.NO_FILE_OR_DIRECTORY) {
+            logger.info(`File wasn't created`);
           } else {
-            logger.info(`File successfully deleted`);
+            logger.error(fileError);
           }
-        });
-      };
-
-      if (size === 0 || !allowTypes.includes(mimetype)) {
-        logger.error(`Empty file or bad mime type. Size ${size}, mimetype: ${mimetype}`);
-        await unlinkFile(filePath);
-
-        throw new AddOfferError();
-      }
-
-      const newFileName = `${generatedName}.${mime.getExtension(mimetype)}`;
-      const newFilePath = path.resolve(__dirname, `../avatars/${newFileName}`);
-
-      try {
-        await fs.rename(filePath, newFilePath, (fileError) => {
-          if (fileError) {
-            throw fileError;
-          }
-
-          logger.info(`File successfully renamed. Original filename: ${originalName}, generated filename: ${newFileName}`);
-        });
-      } catch (fileError) {
-        logger.error(`Can't move file. Original filename: ${originalName}, generated filename: ${newFileName}. Error ${fileError}`);
-
-        throw new AddOfferError();
-      }
-
-      const areAllRequiredFieldsExist = requiredFields.every((requiredField) => keysFromForm.includes(requiredField));
-
-      if (!areAllRequiredFieldsExist) {
-        logger.error(`Not all required fields are presented. Fields from form: ${keysFromForm.toString()}. Required fields: ${requiredFields.toString()}`);
-        await unlinkFile(newFilePath);
-
-        throw new AddOfferError();
-      }
-
-      logger.info(`Form is valid. Send post request to record data`);
-
-      try {
-        const postResponse = await axios
-          .post(`${BASE_API_URL}/api/offers`, Object.assign({}, req.body, {avatar: newFileName}));
-
-        logger.info(`Response status is ${postResponse.status}`);
-        if (postResponse.status === HttpCode.SUCCESS_POST) {
-          res.redirect(`/my`);
+        } else {
+          logger.info(`File successfully deleted`);
         }
-      } catch (postError) {
-        await unlinkFile(newFilePath);
-        logger.error(postError);
-        throw new Error(`Can't save post data. Status: ${postError.response.status}, message: ${postError.response.data}`);
+      });
+    };
+
+    if (size === 0 || ![`image/jpeg`, `image/png`].includes(mimeType)) {
+      logger.error(`Empty file or bad mime type. Size ${size}, mimetype: ${mimeType}`);
+      await unlinkFile(filePath);
+
+      throw new AddOfferError();
+    }
+
+    const newFileName = `${generatedName}.${mime.getExtension(mimeType)}`;
+    const newFilePath = path.resolve(ITEMS_PICTURES_DIR, newFileName);
+
+
+    console.log(newFilePath);
+    await fs.rename(filePath, newFilePath, (fileError) => {
+      if (fileError) {
+        logger.error(`Can't move file. Original filename: ${originalName}, generated filename: ${newFileName}. Error ${fileError}`);
+        next(fileError);
+        // throw new AddOfferError();
       }
+
+      logger.info(`File successfully renamed. Original filename: ${originalName}, generated filename: ${newFileName}`);
     });
+
+    const areAllRequiredFieldsExist = requiredFields.every((requiredField) => keysFromForm.includes(requiredField));
+
+    if (!areAllRequiredFieldsExist) {
+      logger.error(`Not all required fields are presented. Fields from form: ${keysFromForm.toString()}. Required fields: ${requiredFields.toString()}`);
+      await unlinkFile(newFilePath);
+
+      throw new AddOfferError();
+    }
+
+    logger.info(`Form is valid. Send post request to record data`);
+
+    try {
+      const postResponse = await axios
+        .post(`${BASE_API_URL}/api/offers`, Object.assign({}, req.body, {avatar: newFileName}));
+
+      logger.info(`Response status is ${postResponse.status}`);
+      if (postResponse.status === HttpCode.SUCCESS_POST) {
+        res.redirect(`/my`);
+      }
+    } catch (postError) {
+      await unlinkFile(newFilePath);
+      logger.error(postError);
+      throw new Error(`Can't save post data. Status: ${postError.response.status}, message: ${postError.response.data}`);
+    }
   } catch (error) {
     if (error instanceof AddOfferError) {
       res.render(`offers/new-ticket`, {
