@@ -2,45 +2,66 @@
 
 const express = require(`express`);
 const chalk = require(`chalk`);
-const {getLogger} = require(`../logger`);
+const {getLogger, httpLoggerMiddleware} = require(`../logger`);
 const logger = getLogger();
-const pinoMiddleware = require(`express-pino-logger`)({logger});
-
-const offersRouter = require(`../routes/offers`);
-const categoriesRouter = require(`../routes/categories`);
-const searchRouter = require(`../routes/search`);
 
 const DEFAULT_PORT = 3000;
 const {
   HttpCode,
 } = require(`../../constants`);
 
-const app = express();
+const prepareApplication = () => {
+  const offersRouter = require(`../routes/offers`);
+  const categoriesRouter = require(`../routes/categories`);
+  const searchRouter = require(`../routes/search`);
 
-app.use(pinoMiddleware);
-app.use((req, res, next) => {
-  logger.debug(`Start request to url: ${req.url}`);
-  next();
-});
+  const app = express();
 
-app.use(express.json());
-app.use(`/api/offers`, offersRouter);
-app.use(`/api/categories`, categoriesRouter);
-app.use(`/api/search`, searchRouter);
+  app.use(httpLoggerMiddleware);
 
-app.use((req, res) => {
-  res
-    .status(HttpCode.NOT_FOUND)
-    .send(`Not found`);
+  app.use((req, res, next) => {
+    logger.debug(`Start request to url: ${req.url}`);
 
-  logger.error(`End request with error: ${res.statusCode}`);
-});
+    const onRequestFinish = () => {
+      logger.info(`Response status: ${res.statusCode}`);
+      res.off(`finish`, onRequestFinish);
+    };
+
+    res.on(`finish`, onRequestFinish);
+    next();
+  });
+
+  app.use(express.json());
+  app.use(`/api/offers`, offersRouter);
+  app.use(`/api/categories`, categoriesRouter);
+  app.use(`/api/search`, searchRouter);
+
+  app.use((req, res) => {
+    res
+      .status(HttpCode.NOT_FOUND)
+      .send(`Not found`);
+
+    logger.error(`End request with error: ${res.statusCode}`);
+  });
+
+  app.use((error, req, res, next) => {
+    res
+      .status(HttpCode.INTERNAL_ERROR)
+      .send(`Internal server error`);
+
+    logger.error(`Internal error: ${error}`);
+  });
+
+  return app;
+};
 
 module.exports = {
   name: `--server`,
   async run(args) {
     const [customPort] = args;
     const port = Number(customPort) || DEFAULT_PORT;
+
+    const app = prepareApplication();
 
     app
       .listen(port, () => {

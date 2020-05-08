@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === `development`) {
 }
 
 const logger = require(`pino`)({
-  name: `api-server`,
+  name: `front-server`,
   level: process.env.LOG_LEVEL || `info`,
   prettyPrint: true,
 }, require(`pino-multi-stream`).multistream(streams));

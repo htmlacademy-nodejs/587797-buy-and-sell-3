@@ -21,4 +21,8 @@ markup
 mocks.json
 
 #Logs dir
-src/service/logs
+src/service/logs/*.txt
+src/express/logs/*.txt
+
+src/express/tmp
+src/express/avatars

@@ -11,7 +11,7 @@ const {
 
 const {
   DEFAULT_OFFER_NUMBER,
-  MOCK_FILE_PATH,
+  MockFile,
   MAX_MOCK_OBJECT_NUMBER,
   ExitCode,
   FilePath
@@ -27,8 +27,8 @@ const SumRestrict = {
 };
 
 const OfferType = {
-  offer: `offer`,
-  type: `type`
+  BUY: `buy`,
+  SELL: `sell`
 };
 
 const PictureValue = {
@@ -58,6 +58,13 @@ const generateDate = () => {
   return moment().locale(`ru`).format(`DD MMMM YYYY`);
 };
 
+const generateCategories = (categories) => {
+  return categories.map((category) => ({
+    id: nanoid(),
+    name: category
+  }));
+};
+
 const generateOffers = (offersNumber, titles, categories, sentences, commentsText) => {
   const offerTypes = Object.keys(OfferType);
 
@@ -85,13 +92,18 @@ module.exports = {
       process.exit(ExitCode.SUCCESS);
     }
 
+    console.log(args);
+
     const titles = await readContent(FilePath.TITLES);
-    const categories = await readContent(FilePath.CATEGORIES);
+    const categoriesFromFile = await readContent(FilePath.CATEGORIES);
     const sentences = await readContent(FilePath.SENTENCES);
     const commentsText = await readContent(FilePath.COMMENTS_TEXT);
 
+    const categories = generateCategories(categoriesFromFile);
+
     try {
-      await fs.writeFile(MOCK_FILE_PATH, JSON.stringify(generateOffers(offersNumber, titles, categories, sentences, commentsText)));
+      await fs.writeFile(MockFile.CATEGORIES, JSON.stringify(categories));
+      await fs.writeFile(MockFile.OFFERS, JSON.stringify(generateOffers(offersNumber, titles, categories, sentences, commentsText)));
     } catch (error) {
       console.error(chalk.red(`Can't write data to file...`, error));
       process.exit(ExitCode.FAIL);

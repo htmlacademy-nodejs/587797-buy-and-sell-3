@@ -8,9 +8,9 @@
     "test::rest": "jest",
     "eslint": "eslint --ext .js src/",
     "start": "node ./src/service/service.js",
-    "server": "LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty > ./src/service/logs/app.txt 2> ./src/service/logs/errors.txt",
-    "server::debug": "LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | ./node_modules/.bin/pino-pretty > ./src/service/logs/app.txt 2> ./src/service/logs/errors.txt",
-    "start-front-server": "nodemon ./src/express/index.js"
+    "server": "NODE_ENV=production LOG_LEVEL=info nodemon ./src/service/service.js --server 3000",
+    "server::debug": "NODE_ENV=development LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000",
+    "start-front-server": "NODE_ENV=development nodemon ./src/express/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "eslint-config-htmlacademy": "0.5.2",
     "jest": "25.3.0",
     "nodemon": "2.0.2",
+    "pino-multi-stream": "5.0.0",
     "pino-pretty": "4.0.0",
     "supertest": "4.0.2"
   },
@@ -34,10 +35,12 @@
     "axios": "0.19.2",
     "chalk": "3.0.0",
     "express": "4.17.1",
-    "express-pino-logger": "4.0.0",
+    "mime": "2.4.4",
     "moment": "2.24.0",
+    "multer": "1.4.2",
     "nanoid": "3.0.2",
     "pino": "6.2.0",
+    "pino-http": "5.1.0",
     "pug": "2.0.4"
   }
 }
