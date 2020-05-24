@@ -1,49 +1,64 @@
+-- Function for encrypting primary key
+CREATE OR REPLACE FUNCTION pseudo_encrypt(VALUE int) returns int AS $$
+DECLARE
+l1 int;
+l2 int;
+r1 int;
+r2 int;
+i int:=0;
+BEGIN
+ l1:= (VALUE >> 16) & 65535;
+ r1:= VALUE & 65535;
+ WHILE i < 3 LOOP
+   l2 := r1;
+   r2 := l1 # ((((1366 * r1 + 150889) % 714025) / 714025.0) * 32767)::int;
+   l1 := l2;
+   r1 := r2;
+   i := i + 1;
+ END LOOP;
+ RETURN ((r1 << 16) + l1);
+END;
+$$ LANGUAGE plpgsql strict immutable;
+
 TRUNCATE TABLE public.users CASCADE;
 TRUNCATE TABLE public.categories CASCADE;
 TRUNCATE TABLE public.offers CASCADE;
 
-BEGIN;
-INSERT INTO public.users(email, password, name, surname, avatar) VALUES
-('email1@email.com', 'ad21d2a', 'name1', 'surname1', 'avatar1'),
-('email2@email.com', 'ad21d3a', 'name2', 'surname2', 'avatar2');
+INSERT INTO public.users(user_id, email, password, name, surname, avatar) VALUES
+(pseudo_encrypt(1), 'email1@email.com', 'ad21d2a', 'name1', 'surname1', 'avatar1'),
+(pseudo_encrypt(2), 'email2@email.com', 'ad21d3a', 'name2', 'surname2', 'avatar2'),
+(pseudo_encrypt(3), 'email3@email.com', 'ad21d4a', 'name3', 'surname3', 'avatar3'),
+(pseudo_encrypt(4), 'email4@email.com', 'ad21d5a', 'name4', 'surname4', 'avatar4');
 
-INSERT INTO public.categories(name) VALUES
-('Дом'), ('Спорт');
-COMMIT;
+INSERT INTO public.categories(category_id, name) VALUES
+(pseudo_encrypt(1), 'Дом'),
+(pseudo_encrypt(2), 'Спорт');
 
-INSERT INTO public.offers(title, price, type, description, picture, author_id)
-SELECT 'title1', 100, 1, 'description1', 'picture1', user_id FROM users ORDER BY user_id LIMIT 1 OFFSET 0;
-INSERT INTO public.offers(title, price, type, description, picture, author_id)
-SELECT 'title2', 200, 1, 'description2', 'picture2', user_id FROM users ORDER BY user_id LIMIT 1 OFFSET 0;
-INSERT INTO public.offers(title, price, type, description, picture, author_id)
-SELECT 'title3', 300, 1, 'description3', 'picture3', user_id FROM users ORDER BY user_id LIMIT 1 OFFSET 1;
-INSERT INTO public.offers(title, price, type, description, picture, author_id)
-SELECT 'title4', 400, 1, 'description4', 'picture4', user_id FROM users ORDER BY user_id LIMIT 1 OFFSET 1;
-INSERT INTO public.offers(title, price, type, description, picture, author_id)
-SELECT 'title5', 500, 1, 'description5', 'picture5', user_id FROM users ORDER BY user_id LIMIT 1 OFFSET 1;
+INSERT INTO public.offers(offer_id, title, price, type, description, picture, author_id) VALUES
+(pseudo_encrypt(1), 'title1', 100, 1, 'description1', 'picture1', pseudo_encrypt(1)),
+(pseudo_encrypt(2), 'title2', 200, 1, 'description2', 'picture2', pseudo_encrypt(2)),
+(pseudo_encrypt(3), 'title3', 300, 1, 'description3', 'picture3', pseudo_encrypt(1)),
+(pseudo_encrypt(4), 'title4', 400, 1, 'description4', 'picture4', pseudo_encrypt(2)),
+(pseudo_encrypt(5), 'title5', 500, 1, 'description5', 'picture5', pseudo_encrypt(2));
 
--- DECLARE
--- SELECT user_id FROM users;
--- quantity integer DEFAULT 32;
--- SELECT user_id INTO firstUserId FROM users;
--- BEGIN
--- SELECT quantity;
--- END;
---
--- CREATE OR REPLACE FUNCTION get_users() RETURNS integer AS $$
--- DECLARE
---     users integer :=20;
--- 	firstUserId RECORD;
--- BEGIN
---     RAISE NOTICE 'Сейчас quantity = %', users;  -- Выводится 30
---
---     users := 50;
---
---
---     RAISE NOTICE 'Сейчас quantity = %', users;  -- Выводится 50
---
---     RETURN firstUserId;
--- END;
--- $$ LANGUAGE plpgsql;
---
--- SELECT get_users();
+INSERT INTO public.offers_comments(text, offer_id, author_id) VALUES
+('text1',  pseudo_encrypt(1), pseudo_encrypt(3)),
+('text2',  pseudo_encrypt(1), pseudo_encrypt(4)),
+('text3',  pseudo_encrypt(2), pseudo_encrypt(3)),
+('text4',  pseudo_encrypt(2), pseudo_encrypt(4)),
+('text5',  pseudo_encrypt(3), pseudo_encrypt(3)),
+('text6',  pseudo_encrypt(3), pseudo_encrypt(4)),
+('text7',  pseudo_encrypt(4), pseudo_encrypt(3)),
+('text8',  pseudo_encrypt(4), pseudo_encrypt(4)),
+('text9',  pseudo_encrypt(5), pseudo_encrypt(3)),
+('text10', pseudo_encrypt(5), pseudo_encrypt(4));
+
+INSERT INTO public.offers_categories(offer_id, category_id) VALUES
+(pseudo_encrypt(1), pseudo_encrypt(1)),
+(pseudo_encrypt(2), pseudo_encrypt(2)),
+(pseudo_encrypt(3), pseudo_encrypt(1)),
+(pseudo_encrypt(3), pseudo_encrypt(2)),
+(pseudo_encrypt(4), pseudo_encrypt(1)),
+(pseudo_encrypt(4), pseudo_encrypt(2)),
+(pseudo_encrypt(5), pseudo_encrypt(1)),
+(pseudo_encrypt(5), pseudo_encrypt(2));
