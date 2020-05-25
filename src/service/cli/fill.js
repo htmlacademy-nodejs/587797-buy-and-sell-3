@@ -3,37 +3,30 @@
 const chalk = require(`chalk`);
 // const path = require(`path`);
 const fs = require(`fs`).promises;
+const QueriesBuilder = require(`./fill/builder`);
+const QueriesCreator = require(`./fill/creator`);
+const QueriesGenerator = require(`./fill/generator`);
 
-const getEncryptFunction = () => {
-  return `
-  -- Function for encrypting primary key
-CREATE OR REPLACE FUNCTION pseudo_encrypt(VALUE int) returns int AS $$
-DECLARE
-l1 int;
-l2 int;
-r1 int;
-r2 int;
-i int:=0;
-BEGIN
- l1:= (VALUE >> 16) & 65535;
- r1:= VALUE & 65535;
- WHILE i < 3 LOOP
-   l2 := r1;
-   r2 := l1 # ((((1366 * r1 + 150889) % 714025) / 714025.0) * 32767)::int;
-   l1 := l2;
-   r1 := r2;
-   i := i + 1;
- END LOOP;
- RETURN ((r1 << 16) + l1);
-END;
-$$ LANGUAGE plpgsql strict immutable;`.trim();
-};
+const DEFAULT_OFFERS_NUMBER = 5;
 
 module.exports = {
   name: `--fill`,
-  async run() {
+  async run(args) {
     try {
-      await fs.writeFile(`./fill-test.sql`, getEncryptFunction());
+      const [offersNumberArg] = args;
+      const offersNumber = Number(offersNumberArg) || DEFAULT_OFFERS_NUMBER;
+
+      if (offersNumber < DEFAULT_OFFERS_NUMBER) {
+        return console.error(chalk.red(`Bad offers count`));
+      }
+
+      const queriesBuilder = new QueriesBuilder();
+      new QueriesCreator(offersNumber).fillBuilder(queriesBuilder);
+
+      const queriesGenerator = new QueriesGenerator(queriesBuilder);
+      queriesGenerator.generateSQL();
+
+      await fs.writeFile(`./fill-test.sql`, queriesGenerator.getBuiltResult());
     } catch (e) {
       console.log(`err`);
       throw e;
