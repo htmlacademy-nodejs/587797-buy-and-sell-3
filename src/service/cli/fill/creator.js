@@ -4,6 +4,12 @@ const {
   getRandomInt
 } = require(`../../../utils`);
 
+const User = require(`./entities/user`);
+const Offer = require(`./entities/offer`);
+const OffersComment = require(`./entities/offers-comment`);
+const Category = require(`./entities/category`);
+const OffersCategory = require(`./entities/offers-category`);
+
 class Creator {
   constructor(offersCount) {
     this._offersCount = offersCount;
@@ -29,23 +35,23 @@ class Creator {
     });
 
     for (let userId = 1; userId <= this._usersCount; userId++) {
-      builder.addUser(this._createUser(userId));
+      builder.addUser(User.create(userId));
     }
 
     for (let categoryId = 1; categoryId <= this._categoriesCount; categoryId++) {
-      builder.addCategory(this._createCategory(categoryId));
+      builder.addCategory(Category.create(categoryId));
     }
 
     for (let offerId = 1; offerId <= this._offersCount; offerId++) {
       const offersUserId = this._getRandomUserId();
       const commentAuthorId = this._getRandomUserExclude(offersUserId);
 
-      builder.addOffer(this._createOffer(offerId, offersUserId));
-      builder.addOffersComment(this._createOffersComments((2 * offerId) - 1), offerId, commentAuthorId);
-      builder.addOffersComment(this._createOffersComments(2 * offerId), offerId, commentAuthorId);
+      builder.addOffer(Offer.create(offerId, offersUserId));
+      builder.addOffersComment(OffersComment.create((2 * offerId) - 1), offerId, commentAuthorId);
+      builder.addOffersComment(OffersComment.create(2 * offerId), offerId, commentAuthorId);
 
       this._getRandomCategoriesIds().forEach((categoryId) => {
-        builder.addOffersCategory(this._createOffersCategory(offerId, categoryId));
+        builder.addOffersCategory(OffersCategory.create(offerId, categoryId));
       });
     }
   }
@@ -77,50 +83,6 @@ class Creator {
 
   _createTruncateTable(table) {
     return `TRUNCATE TABLE public.${table} CASCADE;`;
-  }
-
-  _createUser(userId) {
-    return [
-      `pseudo_encrypt(${userId})`,
-      `testPassword${userId}`,
-      `testName${userId}`,
-      `testSurname${userId}`,
-      `testAvatar${userId}`
-    ];
-  }
-
-  _createCategory(categoryId) {
-    return [
-      `pseudo_encrypt(${categoryId})`, // category id
-      `name${categoryId}` // name
-    ];
-  }
-
-  _createOffer(offerId, userId) {
-    return [
-      `pseudo_encrypt(${offerId})`,
-      `testPassword${offerId}`,
-      `testName${offerId}`,
-      `testSurname${offerId}`,
-      `testAvatar${offerId}`,
-      `pseudo_encrypt(${userId})`
-    ];
-  }
-
-  _createOffersComments(commentId, offerId, userId) {
-    return [
-      `pseudo_encrypt(${commentId})`, // comment id
-      `testText${commentId}`,
-      `pseudo_encrypt(${offerId})`, // offer_id
-      `pseudo_encrypt(${userId})`, // author id
-    ];
-  }
-
-  _createOffersCategory(offerId, categoryId) {
-    return [
-      `pseudo_encrypt(${offerId})`, // offer id
-      `pseudo_encrypt(${categoryId})` // category id
-    ];
   }
 
   _getRandomUserId() {

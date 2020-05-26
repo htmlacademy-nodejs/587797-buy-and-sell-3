@@ -1,5 +1,11 @@
 'use strict';
 
+const User = require(`./entities/user`);
+const Offer = require(`./entities/offer`);
+const OffersComment = require(`./entities/offers-comment`);
+const Category = require(`./entities/category`);
+const OffersCategory = require(`./entities/offers-category`);
+
 class Generator {
   constructor(builder) {
     this._builder = builder;
@@ -13,39 +19,25 @@ class Generator {
     this._add(this._builder._truncateTables.join(`\n`));
     this._add(this._getEmptyLine(2));
 
-    this._add(this._insertIntoUsers());
+    this._add(this._getInsertQuery(User.tableName(), User.fields(), this._builder._users));
     this._add(this._getEmptyLine(2));
 
-    this._add(this._insertIntoCategories());
+    this._add(this._getInsertQuery(Category.tableName(), Category.fields(), this._builder._categories));
     this._add(this._getEmptyLine(2));
 
-    this._add(this._insertIntoOffers());
+    this._add(this._getInsertQuery(Offer.tableName(), Offer.fields(), this._builder._offers));
     this._add(this._getEmptyLine(2));
 
-    this._add(this._insertIntoOffersComments());
+    this._add(this._getInsertQuery(OffersComment.tableName(), OffersComment.fields(), this._builder._offersComments));
     this._add(this._getEmptyLine(2));
 
-    this._add(this._insertIntoOffersCategories());
+    this._add(this._getInsertQuery(OffersCategory.tableName(), OffersCategory.fields(), this._builder._offersCategories));
+
+    return this;
   }
 
-  _insertIntoUsers() {
-    return `INSERT INTO public.users(user_id, email, password, name, surname, avatar) VALUES(\n${this._builder._users.join(`),\n(`)})`;
-  }
-
-  _insertIntoCategories() {
-    return `INSERT INTO public.categories(category_id, name) VALUES(\n${this._builder._categories.join(`),\n(`)})`;
-  }
-
-  _insertIntoOffers() {
-    return `INSERT INTO public.offers(offer_id, title, price, type, description, picture, author_id) VALUES(\n${this._builder._offers.join(`),\n(`)})`;
-  }
-
-  _insertIntoOffersComments() {
-    return `INSERT INTO public.offers_comments(text, offer_id, author_id) VALUES\n(${this._builder._offersComments.join(`),\n(`)})`;
-  }
-
-  _insertIntoOffersCategories() {
-    return `INSERT INTO public.offers_categories(offer_id, category_id) VALUES(\n${this._builder._offersCategories.join(`),\n(`)})`;
+  _getInsertQuery(tableName, fields, values) {
+    return `INSERT INTO public.${tableName}(${fields.join(`, `)}) VALUES\n(${values.join(`),\n(`)})`;
   }
 
   _getEmptyLine(quantityOfLines = 1) {

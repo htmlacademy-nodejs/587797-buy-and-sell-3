@@ -23,10 +23,7 @@ module.exports = {
       const queriesBuilder = new QueriesBuilder();
       new QueriesCreator(offersNumber).fillBuilder(queriesBuilder);
 
-      const queriesGenerator = new QueriesGenerator(queriesBuilder);
-      queriesGenerator.generateSQL();
-
-      await fs.writeFile(`./fill-test.sql`, queriesGenerator.getBuiltResult());
+      await fs.writeFile(`./fill-test.sql`, new QueriesGenerator(queriesBuilder).generateSQL().getBuiltResult());
     } catch (e) {
       console.log(`err`);
       throw e;
