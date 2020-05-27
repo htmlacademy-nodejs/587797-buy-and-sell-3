@@ -6,16 +6,17 @@ module.exports = class User {
   }
 
   static fields() {
-    return [`user_id`, `email`, `password`, `name`, `avatar`];
+    return [`user_id`, `email`, `password`, `name`, `surname`, `avatar`];
   }
 
   static create(userId) {
     return [
       `pseudo_encrypt(${userId})`,
-      `testPassword${userId}`,
-      `testName${userId}`,
-      `testSurname${userId}`,
-      `testAvatar${userId}`
+      `'testEmail${userId}@gmail.com'`,
+      `'testPassword${userId}'`,
+      `'testName${userId}'`,
+      `'testSurname${userId}'`,
+      `'testAvatar${userId}'`
     ];
   }
 };

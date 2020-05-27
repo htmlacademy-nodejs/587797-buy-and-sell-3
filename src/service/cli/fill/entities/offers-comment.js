@@ -12,7 +12,7 @@ module.exports = class OffersComment {
   static create(commentId, offerId, userId) {
     return [
       `pseudo_encrypt(${commentId})`,
-      `testText${commentId}`,
+      `'testText${commentId}'`,
       `pseudo_encrypt(${offerId})`,
       `pseudo_encrypt(${userId})`
     ];

@@ -1,9 +1,8 @@
 'use strict';
 
 const chalk = require(`chalk`);
-// const path = require(`path`);
 const fs = require(`fs`).promises;
-const QueriesBuilder = require(`./fill/builder`);
+const EntitiesDTO = require(`./fill/entitiesDTO`);
 const QueriesCreator = require(`./fill/creator`);
 const QueriesGenerator = require(`./fill/generator`);
 
@@ -20,15 +19,14 @@ module.exports = {
         return console.error(chalk.red(`Bad offers count`));
       }
 
-      const queriesBuilder = new QueriesBuilder();
-      new QueriesCreator(offersNumber).fillBuilder(queriesBuilder);
+      const entitiesDTO = new EntitiesDTO();
+      new QueriesCreator(offersNumber).fillBuilder(entitiesDTO);
 
-      await fs.writeFile(`./fill-test.sql`, new QueriesGenerator(queriesBuilder).generateSQL().getBuiltResult());
-    } catch (e) {
-      console.log(`err`);
-      throw e;
+      await fs.writeFile(`./fill-db.sql`, new QueriesGenerator(entitiesDTO).generateSQL().getBuiltResult());
+    } catch (error) {
+      return console.error(chalk.red(`fill-db error: ${error}`));
     }
 
-    return console.info(chalk.gray(`fill-db command`));
+    return console.info(chalk.green(`File successfully generated`));
   }
 };

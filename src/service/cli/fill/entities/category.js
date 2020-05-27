@@ -12,7 +12,7 @@ module.exports = class Category {
   static create(categoryId) {
     return [
       `pseudo_encrypt(${categoryId})`,
-      `name${categoryId}`
+      `'name${categoryId}'`
     ];
   }
 };

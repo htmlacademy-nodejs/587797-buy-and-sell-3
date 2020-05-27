@@ -2,21 +2,21 @@
 
 module.exports = class Offer {
   static tableName() {
-    return `offer`;
+    return `offers`;
   }
 
   static fields() {
     return [`offer_id`, `title`, `price`, `type`, `description`, `picture`, `author_id`];
   }
 
-  static create(offerId, userId) {
+  static create(offerId, userId, price) {
     return [
       `pseudo_encrypt(${offerId})`,
-      `testTitle${offerId}`,
-      `testPrice${offerId}`,
+      `'testTitle${offerId}'`,
+      `${price}`,
       1,
-      `testDescription${offerId}`,
-      `testPicture${offerId}`,
+      `'testDescription${offerId}'`,
+      `'testPicture${offerId}'`,
       `pseudo_encrypt(${userId})`
     ];
   }

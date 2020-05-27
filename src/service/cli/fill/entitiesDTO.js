@@ -1,18 +1,13 @@
 'use strict';
 
-class Builder {
+module.exports = class EntitiesDTO {
   constructor() {
-    this._functions = [];
     this._truncateTables = [];
     this._users = [];
     this._offers = [];
     this._categories = [];
     this._offersComments = [];
     this._offersCategories = [];
-  }
-
-  addFunction(fn) {
-    this._functions.push(fn);
   }
 
   addTableForTruncate(table) {
@@ -38,6 +33,28 @@ class Builder {
   addOffersCategory(offersCategory) {
     this._offersCategories.push(offersCategory);
   }
-}
 
-module.exports = Builder;
+  getTablesForTruncate() {
+    return this._truncateTables;
+  }
+
+  get users() {
+    return this._users;
+  }
+
+  get offers() {
+    return this._offers;
+  }
+
+  get offersComments() {
+    return this._offersComments;
+  }
+
+  get categories() {
+    return this._categories;
+  }
+
+  get offersCategories() {
+    return this._offersCategories;
+  }
+};
