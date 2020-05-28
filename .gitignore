@@ -26,3 +26,5 @@ src/express/logs/*.txt
 
 src/express/tmp
 src/express/avatars
+
+fill-db.sql

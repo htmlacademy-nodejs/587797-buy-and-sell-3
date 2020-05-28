@@ -92,8 +92,6 @@ module.exports = {
       process.exit(ExitCode.SUCCESS);
     }
 
-    console.log(args);
-
     const titles = await readContent(FilePath.TITLES);
     const categoriesFromFile = await readContent(FilePath.CATEGORIES);
     const sentences = await readContent(FilePath.SENTENCES);
