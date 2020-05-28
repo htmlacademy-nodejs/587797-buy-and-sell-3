@@ -3,7 +3,7 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`).promises;
 const EntitiesDTO = require(`./fill/entitiesDTO`);
-const QueriesCreator = require(`./fill/creator`);
+const EntitiesCreator = require(`./fill/creator`);
 const QueriesGenerator = require(`./fill/generator`);
 
 const DEFAULT_OFFERS_NUMBER = 5;
@@ -20,7 +20,8 @@ module.exports = {
       }
 
       const entitiesDTO = new EntitiesDTO();
-      new QueriesCreator(offersNumber).fillBuilder(entitiesDTO);
+      const queriesCreator = await EntitiesCreator.getCreator(offersNumber);
+      queriesCreator.fillEntitiesDTO(entitiesDTO);
 
       await fs.writeFile(`./fill-db.sql`, new QueriesGenerator(entitiesDTO).generateSQL().getBuiltResult());
     } catch (error) {

@@ -9,10 +9,10 @@ module.exports = class Category {
     return [`category_id`, `name`];
   }
 
-  static create(categoryId) {
+  static create(categoryId, categoryName) {
     return [
       `pseudo_encrypt(${categoryId})`,
-      `'name${categoryId}'`
+      `'${categoryName}'`
     ];
   }
 };

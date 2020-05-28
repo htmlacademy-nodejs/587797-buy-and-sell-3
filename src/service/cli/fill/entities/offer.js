@@ -9,13 +9,13 @@ module.exports = class Offer {
     return [`offer_id`, `title`, `price`, `type`, `description`, `picture`, `author_id`];
   }
 
-  static create(offerId, userId, price) {
+  static create(offerId, userId, offerType, price, title, description) {
     return [
       `pseudo_encrypt(${offerId})`,
-      `'testTitle${offerId}'`,
+      `'${title}'`,
       `${price}`,
-      1,
-      `'testDescription${offerId}'`,
+      offerType,
+      `'${description}'`,
       `'testPicture${offerId}'`,
       `pseudo_encrypt(${userId})`
     ];

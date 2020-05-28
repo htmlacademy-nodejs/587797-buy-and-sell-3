@@ -9,10 +9,10 @@ module.exports = class OffersComment {
     return [`comment_id`, `text`, `offer_id`, `author_id`];
   }
 
-  static create(commentId, offerId, userId) {
+  static create(commentId, text, offerId, userId) {
     return [
       `pseudo_encrypt(${commentId})`,
-      `'testText${commentId}'`,
+      `'${text}'`,
       `pseudo_encrypt(${offerId})`,
       `pseudo_encrypt(${userId})`
     ];
