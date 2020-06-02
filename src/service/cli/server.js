@@ -4,6 +4,7 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const {getLogger, httpLoggerMiddleware} = require(`../logger`);
 const logger = getLogger();
+const db = require(`../db`);
 
 const DEFAULT_PORT = 3000;
 const {
@@ -61,6 +62,7 @@ module.exports = {
     const [customPort] = args;
     const port = Number(customPort) || DEFAULT_PORT;
 
+    await db.connect();
     const app = prepareApplication();
 
     app
