@@ -14,7 +14,7 @@ module.exports = class Offer {
       `pseudo_encrypt(${offerId})`,
       `'${title}'`,
       `${price}`,
-      offerType,
+      `'${offerType}'`,
       `'${description}'`,
       `'testPicture${offerId}'`,
       `pseudo_encrypt(${userId})`

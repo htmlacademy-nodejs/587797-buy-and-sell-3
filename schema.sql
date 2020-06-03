@@ -36,6 +36,9 @@ CREATE SEQUENCE categories_sequence;
 CREATE SEQUENCE offers_sequence;
 CREATE SEQUENCE offers_comments_sequence;
 
+DROP TYPE IF EXISTS offer_type;
+CREATE TYPE offer_type AS ENUM ('buy', 'sell');
+
 CREATE TABLE public.users (
     user_id    BIGINT       NOT NULL PRIMARY KEY DEFAULT pseudo_encrypt(nextval('users_sequence')::int),
     email      VARCHAR(256) NOT NULL,
@@ -57,7 +60,7 @@ CREATE TABLE public.offers (
     offer_id    BIGINT       NOT NULL PRIMARY KEY DEFAULT pseudo_encrypt(nextval('offers_sequence')::int),
     title       VARCHAR(256) NOT NULL,
     price       BIGINT       NOT NULL,
-    type        SMALLINT     NOT NULL,
+    type        offer_type   NOT NULL,
     description TEXT         NOT NULL,
     picture     VARCHAR(256) NOT NULL,
     author_id   BIGINT       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
@@ -79,8 +82,3 @@ CREATE TABLE public.offers_categories (
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (offer_id, category_id)
 );
-
--- INSERT INTO users VALUES(1, 'email1@email.com', 'ad21d2a', 'name1', 'surname1', 'avatar1');
--- INSERT INTO categories VALUES (1, 'books'), (2, 'sport'), (3, 'cars');
--- INSERT INTO offers VALUES(1, 'title1', 500, 1, 'desc1', 'picture1', 1);
--- INSERT INTO offers_categories VALUES(1, 1);
