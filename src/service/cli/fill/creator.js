@@ -12,8 +12,8 @@ const RandomPrice = {
 };
 
 const OfferType = {
-  BUY: 1,
-  SELL: 2
+  BUY: `buy`,
+  SELL: `sell`
 };
 
 const {
