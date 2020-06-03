@@ -24,8 +24,12 @@ module.exports = {
       logger.info(`Start connecting to database...`);
       await sequelize.authenticate();
       logger.info(`Successfully connected to database`);
+
+      return true;
     } catch (err) {
       logger.error(`Can't connect to database: ${err}`);
+
+      return false;
     }
   }
 };

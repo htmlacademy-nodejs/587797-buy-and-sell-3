@@ -8,7 +8,8 @@ const db = require(`../db`);
 
 const DEFAULT_PORT = 3000;
 const {
-  HttpCode,
+  ExitCode,
+  HttpCode
 } = require(`../../constants`);
 
 const prepareApplication = () => {
@@ -62,7 +63,13 @@ module.exports = {
     const [customPort] = args;
     const port = Number(customPort) || DEFAULT_PORT;
 
-    await db.connect();
+    const isSuccessDbConnect = await db.connect();
+
+    if (!isSuccessDbConnect) {
+      logger.error(`Db problem. Stop launching application...`);
+
+      process.exit(ExitCode.FAIL);
+    }
     const app = prepareApplication();
 
     app
