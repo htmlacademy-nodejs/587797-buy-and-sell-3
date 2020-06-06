@@ -46,14 +46,16 @@ CREATE TABLE public.users (
     name       VARCHAR(256) NOT NULL,
     surname    VARCHAR(256) NOT NULL,
     avatar     VARCHAR(256) NOT NULL,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE UNIQUE INDEX users_email ON public.users(email);
 
 CREATE TABLE public.categories (
     category_id BIGINT       NOT NULL PRIMARY KEY DEFAULT pseudo_encrypt(nextval('categories_sequence')::int),
     name        VARCHAR(256) NOT NULL,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE public.offers (
@@ -64,7 +66,8 @@ CREATE TABLE public.offers (
     description TEXT         NOT NULL,
     picture     VARCHAR(256) NOT NULL,
     author_id   BIGINT       NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX offers_title ON public.offers(title);
 
@@ -73,7 +76,8 @@ CREATE TABLE public.offers_comments (
     text       TEXT      NOT NULL,
     offer_id   BIGINT    NOT NULL REFERENCES offers(offer_id) ON DELETE CASCADE,
     author_id  BIGINT    NOT NULL REFERENCES users(user_id)   ON DELETE CASCADE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE public.offers_categories (
