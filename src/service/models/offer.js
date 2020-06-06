@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     offer_id: {
       type: DataTypes.BIGINT,
       primaryKey: true,
+      autoIncrement: true,
       allowNull: false
     },
     title: {

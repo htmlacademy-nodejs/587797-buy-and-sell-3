@@ -4,6 +4,7 @@ const express = require(`express`);
 const chalk = require(`chalk`);
 const {getLogger, httpLoggerMiddleware} = require(`../logger`);
 const logger = getLogger();
+const routes = require(`../api`);
 const db = require(`../db`);
 
 const DEFAULT_PORT = 3000;
@@ -14,7 +15,7 @@ const {
 
 const prepareApplication = () => {
   const offersRouter = require(`../routes/offers`);
-  const categoriesRouter = require(`../routes/categories`);
+  // const categoriesRouter = require(`../routes/categories`);
   const searchRouter = require(`../routes/search`);
 
   const app = express();
@@ -35,8 +36,9 @@ const prepareApplication = () => {
 
   app.use(express.json());
   app.use(`/api/offers`, offersRouter);
-  app.use(`/api/categories`, categoriesRouter);
+  // app.use(`/api/categories`, categoriesRouter);
   app.use(`/api/search`, searchRouter);
+  app.use(`/api`, routes);
 
   app.use((req, res) => {
     res
@@ -63,13 +65,14 @@ module.exports = {
     const [customPort] = args;
     const port = Number(customPort) || DEFAULT_PORT;
 
-    const isSuccessDbConnect = await db.connect();
+    const dbConnection = await db.getConnection();
 
-    if (!isSuccessDbConnect) {
+    if (!dbConnection) {
       logger.error(`Db problem. Stop launching application...`);
 
       process.exit(ExitCode.FAIL);
     }
+
     const app = prepareApplication();
 
     app
