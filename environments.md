@@ -8,4 +8,6 @@
 
 `DB_HOST` — хост;
 
+`DB_PORT` = порт;
+
 `DB_DIALECT` — тип субд (postgres);

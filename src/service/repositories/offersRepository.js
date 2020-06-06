@@ -10,7 +10,7 @@ const {
 class OffersRepository {
   constructor() {
     this.offers = JSON.parse(fs.readFileSync(MockFile.OFFERS));
-    this.offerRequiredFields = [`title`, `description`, `categories`, `price`, `type`, `avatar`];
+    this._offerRequiredFields = [`title`, `price`, `type`, `description`, `picture`, `author_id`];
     this.commentRequiredFields = [`comment`];
   }
 
@@ -220,13 +220,13 @@ class OffersRepository {
   _isValidPostData(data) {
     const fieldsKeys = Object.keys(data);
 
-    return this.offerRequiredFields.every((requiredField) => fieldsKeys.includes(requiredField));
+    return this._offerRequiredFields.every((requiredField) => fieldsKeys.includes(requiredField));
   }
 
   _isValidPutData(data) {
     const fieldsKeys = Object.keys(data);
 
-    return fieldsKeys.every((requiredField) => this.offerRequiredFields.includes(requiredField));
+    return fieldsKeys.every((requiredField) => this._offerRequiredFields.includes(requiredField));
   }
 
   _isValidCommentPostData(data) {

@@ -2,6 +2,7 @@
 
 const {Router} = require(`express`);
 const OffersRepository = require(`../repositories/offersRepository`);
+// const User =
 
 const {
   HttpCode,
@@ -39,7 +40,6 @@ offersRouter
     } else {
       res.status(HttpCode.NOT_FOUND).send(response.body.message);
     }
-
   });
 
 offersRouter
